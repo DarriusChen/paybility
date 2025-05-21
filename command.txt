@@ -1,0 +1,4 @@
+# Run
+python src\main.py [src]
+
+# test.py 批次執行main.py 測試資料用
