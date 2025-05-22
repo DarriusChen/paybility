@@ -11,7 +11,6 @@ def contains_none(d):
         return True
         
         
-
 root_path = Path("data").resolve()
 # print(root_path)
 
