@@ -3,7 +3,6 @@ from pathlib import Path
 from logger import setup_logger
 
 def load_complex_schema(path: str|Path,
-                        is_template: bool = True,
                         header_rows: list[int] = [2, 3],
                         sheet: int = 0) -> list[str]:
     """讀取雙層表頭並攤平成單層欄位。
