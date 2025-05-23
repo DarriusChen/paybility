@@ -1,6 +1,7 @@
 import pandas as pd
 from pathlib import Path
 from logger import setup_logger
+from configparser import ConfigParser
 
 def load_complex_schema(path: str|Path,
                         header_rows: list[int] = [2, 3],
@@ -40,8 +41,12 @@ def validate_data(template_file: str|Path,
 
     result = True
     
+    config = ConfigParser()
+    config.read('config.ini')
+    log_file = config.get('schema_validator', 'log_file')
+    
     logger = setup_logger(name='schema_validator',
-                          file_path='schema_validator.log')
+                          file_path=log_file)
     
     try:
         template_columns = load_complex_schema(path=template_file, is_template=True)
