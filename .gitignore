@@ -9,3 +9,6 @@ __pycache__/
 *.pyw
 *.pyz
 *.pywz
+
+# logs output
+output/logs/
