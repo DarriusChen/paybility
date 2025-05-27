@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+import os
 
 def setup_logger(name: str,
                  level: int = logging.INFO,
@@ -27,6 +28,7 @@ def setup_logger(name: str,
     )
 
     if file_path:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w') as f:
             pass
 

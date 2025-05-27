@@ -9,9 +9,10 @@ from result import Result
 
 config = configparser.ConfigParser()
 config.read('config.ini')
-result_path = config['result_path']['path']
+result_path = config['output_path']['result_path']
+log_path = config['output_path']['log_path']
 
-logger = setup_logger(name=__name__, file_path=f'../output/logs/{__name__}.log')
+logger = setup_logger(name=__name__, file_path=f'{log_path}/{__name__}.log')
 
 parser = argparse.ArgumentParser(description='Paybility')
 

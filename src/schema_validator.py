@@ -6,10 +6,9 @@ from logger import setup_logger, format_func_msg
 
 config = configparser.ConfigParser()
 config.read('config.ini')
-result_path = config['result_path']['path']
+log_path = config['output_path']['log_path']
 
-logger = setup_logger(name=__name__,
-                      file_path=f'./output/logs/{__name__}.log')
+logger = setup_logger(name=__name__, file_path=f'{log_path}/{__name__}.log')
 
 def load_complex_schema(path: str|Path,
                         header_rows: list[int] = [2, 3],
