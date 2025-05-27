@@ -2,8 +2,8 @@ import logging
 from typing import Optional
 
 def setup_logger(name: str,
-                level: int = logging.INFO,
-                file_path: Optional[str] = None) -> logging.Logger:
+                 level: int = logging.INFO,
+                 file_path: Optional[str] = None) -> logging.Logger:
     """設定 logger。
     
     Args:
@@ -15,11 +15,11 @@ def setup_logger(name: str,
         logging.Logger: 配置好的 logger 實例
     """
     logger = logging.getLogger(name)
-    
+
     # 避免重複添加 handlers
     if logger.handlers:
         return logger
-        
+
     logger.setLevel(level)
 
     formatter = logging.Formatter(
@@ -27,9 +27,12 @@ def setup_logger(name: str,
     )
 
     if file_path:
-        file_handler = logging.FileHandler(file_path)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+        with open(file_path, 'w') as f:
+            pass
+
+    file_handler = logging.FileHandler(file_path)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
 
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
@@ -48,4 +51,3 @@ def format_func_msg(func: str, msg: str) -> str:
         str: 格式化後的訊息
     """
     return f"{func} : {msg}"
-        
