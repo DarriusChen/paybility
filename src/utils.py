@@ -12,6 +12,7 @@ TABLES = config.get('path_parameter', 'tables').split(',')
 # Path Config
 RESULT_PATH = config['output_path']['result_path']
 LOG_PATH = config['output_path']['log_path']
+TEMPLETE_PATH = config['output_path']['template_path']
 
 # print(MAX_YEAR, MIN_TEAR, PERIOD, COUNTY, TABLES)
 
@@ -55,7 +56,8 @@ def get_dict_template(name: str):
         template["sub_status"] = sub_status
     elif name == "schema_check":
         sub_status = {
-
+            "entity_code": attribute(),
+            "column_name": attribute()
         }
         template["sub_status"] = sub_status
     else:
