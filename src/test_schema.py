@@ -1,5 +1,5 @@
 import configparser
-from schema_validator import validate_data
+from schema_validator import validate_schema
 from result import Result
 
 config = configparser.ConfigParser()
@@ -15,7 +15,7 @@ result_obj = Result(file_name=file_name, result_path=result_path)
 
 
 if __name__ == "__main__":
-    result = validate_data(
+    result = validate_schema(
         file_type="表單9",
         data_file=data_file)
     result_obj.update_result('schema_check', result)
