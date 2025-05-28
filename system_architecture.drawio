@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="R3MCaV5okG5-uP8U4sA2" name="Overview">
-        <mxGraphModel dx="1062" dy="482" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1062" dy="562" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -223,7 +223,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="uDkhnKWfSCEcHw3YCvQZ" name="流程圖">
-        <mxGraphModel dx="1062" dy="482" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1062" dy="562" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -233,7 +233,7 @@
                 <mxCell id="nsEoL1BPUs58Sx67tx0J-2" value="file_validator.py" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="260" y="40" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-16" value="" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="nsEoL1BPUs58Sx67tx0J-3">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-16" value="" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;endArrow=none;endFill=0;" parent="1" source="nsEoL1BPUs58Sx67tx0J-3" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="420" y="70" as="targetPoint"/>
                         <Array as="points">
@@ -250,7 +250,7 @@
                         <mxPoint x="230" y="230" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="nsEoL1BPUs58Sx67tx0J-8" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="nsEoL1BPUs58Sx67tx0J-12">
+                <mxCell id="nsEoL1BPUs58Sx67tx0J-8" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="nsEoL1BPUs58Sx67tx0J-12" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="380" y="70" as="sourcePoint"/>
                         <mxPoint x="460" y="70" as="targetPoint"/>
@@ -271,10 +271,10 @@
                 <mxCell id="nsEoL1BPUs58Sx67tx0J-15" value="1. 整合" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="80" y="110" width="60" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-1" value="schema_validator.py" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-1" value="schema_validator.py" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="260" y="180" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-2" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endFill=1;" edge="1" parent="1" target="vC9C5nhdSHlLk2iu63cF-1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-2" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endFill=1;" parent="1" target="vC9C5nhdSHlLk2iu63cF-1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="220" y="70" as="sourcePoint"/>
                         <mxPoint x="440" y="220" as="targetPoint"/>
@@ -283,7 +283,7 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-3" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endFill=1;" edge="1" parent="1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-3" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endFill=1;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="220" y="190" as="sourcePoint"/>
                         <mxPoint x="260" y="350" as="targetPoint"/>
@@ -292,7 +292,7 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-5" value="" style="endArrow=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="vC9C5nhdSHlLk2iu63cF-1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-5" value="" style="endArrow=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="vC9C5nhdSHlLk2iu63cF-1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="390" y="270" as="sourcePoint"/>
                         <mxPoint x="420" y="70" as="targetPoint"/>
@@ -301,34 +301,34 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-7" value="&lt;div&gt;&lt;font&gt;1. 資料庫檢索&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font&gt;2.&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(63, 63, 63); background-color: transparent;&quot;&gt;商業邏輯檢查&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-7" value="&lt;div&gt;&lt;font&gt;1. 資料庫檢索&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font&gt;2.&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(63, 63, 63); background-color: transparent;&quot;&gt;商業邏輯檢查&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="270" y="395" width="110" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-8" value="&lt;div style=&quot;text-align: left;&quot;&gt;&lt;ul&gt;&lt;li&gt;&lt;font style=&quot;color: rgb(255, 0, 0); font-size: 14px;&quot;&gt;把針對格式或是文字敘述錯誤的歸類到schema_validator&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;color: rgb(255, 0, 0); font-size: 14px;&quot;&gt;跟資料庫互動的才放在logic_validator&lt;/font&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-8" value="&lt;div style=&quot;text-align: left;&quot;&gt;&lt;ul&gt;&lt;li&gt;&lt;font style=&quot;color: rgb(255, 0, 0); font-size: 14px;&quot;&gt;把針對格式或是文字敘述錯誤的歸類到schema_validator&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;color: rgb(255, 0, 0); font-size: 14px;&quot;&gt;跟資料庫互動的才放在logic_validator&lt;/font&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
                     <mxGeometry x="440" y="290" width="410" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-9" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;Todo&lt;br&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;1.Define 一個統一的輸出形式如json、dict等 給logger抓取&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;2.討論一下他們給的邏輯應該要怎麼區分&lt;/span&gt;&lt;/div&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=#666666;fillColor=#f5f5f5;fontColor=#333333;" vertex="1" parent="1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-9" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;Todo&lt;br&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;1.Define 一個統一的輸出形式如json、dict等 給logger抓取&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;2.討論一下他們給的邏輯應該要怎麼區分&lt;/span&gt;&lt;/div&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=#666666;fillColor=#f5f5f5;fontColor=#333333;" parent="1" vertex="1">
                     <mxGeometry x="440" y="390" width="410" height="70" as="geometry"/>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-10" value="update.py" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-10" value="update.py" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="680" y="40" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-13" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-13" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="590" y="69.5" as="sourcePoint"/>
                         <mxPoint x="680" y="69.5" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-14" value="1. 資料正規化&lt;div&gt;2. 更新資料庫&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-14" value="1. 資料正規化&lt;div&gt;2. 更新資料庫&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="690" y="105" width="100" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-17" value="visualization.py" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-17" value="visualization.py" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="680" y="180" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-18" value="1. logger可視化" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-18" value="1. logger可視化" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="685" y="250" width="110" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="vC9C5nhdSHlLk2iu63cF-19" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="vC9C5nhdSHlLk2iu63cF-17">
+                <mxCell id="vC9C5nhdSHlLk2iu63cF-19" value="" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="vC9C5nhdSHlLk2iu63cF-17" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="630" y="70" as="sourcePoint"/>
                         <mxPoint x="690" y="79.5" as="targetPoint"/>
