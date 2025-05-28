@@ -2,7 +2,7 @@ import argparse
 from file_validator import validate_path
 
 from logger import setup_logger, format_func_msg
-from schema_validator import validate_data
+from schema_validator import validate_schema
 from result import Result
 # config
 from utils import RESULT_PATH, LOG_PATH
@@ -46,10 +46,7 @@ def main(args):
     # ------------------------------------------------------------ #
     
     # Step 2: schema check
-    schema_result = validate_data(
-        file_type=file_type,
-        data_file=args.filepath,
-    )
+    schema_result = validate_schema(file_type=file_type, data_file=args.filepath)
     
     # 更新 Schema 檢查結果
     if result_obj.update_result('schema_check', schema_result):
