@@ -1,44 +1,47 @@
 import argparse
-import configparser
-
-from file_validator import PathValidator
+from file_validator import validate_path
 
 from logger import setup_logger, format_func_msg
 from schema_validator import validate_data
 from result import Result
+# config
+from utils import RESULT_PATH, LOG_PATH
 
-config = configparser.ConfigParser()
-config.read('config.ini')
-result_path = config['output_path']['result_path']
-log_path = config['output_path']['log_path']
-
-logger = setup_logger(name=__name__, file_path=f'{log_path}/{__name__}.log')
+logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')
 
 parser = argparse.ArgumentParser(description='Paybility')
 
 parser.add_argument('filepath', type=str, help='.xls path')
-parser.add_argument('--maxyear', type=int, help='最大民國年限', default=150)
-parser.add_argument('--minyear', type=int, help='最小民國年限', default=0)
-parser.add_argument('--period', type=list, help='期別', default=['2', '3', '31', '4', '41', '5'])
-parser.add_argument('--county', type=list, help='縣市', default=['台北', '新北', '桃園', '台中', '台南', '高雄', '彰化', '南投'])
-parser.add_argument('--tables', type=list, help='表種', default=['表4', '表7', '表9', '表單4', '表單7', '表單9'])
 
 def main(args):
     
     # 創建 Result object
-    result_obj = Result(file=args.filepath, result_path=result_path)
+    result_obj = Result(file_name=args.filepath, result_path=RESULT_PATH)
     
     # Step 1: file check
-    pv = PathValidator(args) # TODO: 傳入 result_obj
-    info = pv.show_info()
-    file_type = info['File_name']["Table"]
-    # file_check_result = pv.show_result() # TODO: 用result.py 更新result
+    # pv = PathValidator(args) # TODO: 傳入 result_obj
+    path_check_result, file_check_result, filename_check_result = validate_path(args.filepath)
+    file_type = filename_check_result["sub_status"]["table"]["info"]
+
     
     # 更新 File level 檢查結果
-    # if result_obj.update_result('file_check', file_check_result["result"]["file_check"]):
-    #     logger.info(format_func_msg(func='main', msg="文件檢查結果更新成功"))
-    # else:
-    #     logger.error(format_func_msg(func='main', msg="文件檢查結果更新失敗"))
+    # update path_check
+    if result_obj.update_result('path_check', path_check_result):
+        logger.info(format_func_msg(func='main', msg="Path 檢查結果更新成功"))
+    else:
+        logger.error(format_func_msg(func='main', msg="Path 檢查結果更新失敗"))
+        
+    # update file_check
+    if result_obj.update_result('file_check', file_check_result):
+        logger.info(format_func_msg(func='main', msg="File 檢查結果更新成功"))
+    else:
+        logger.error(format_func_msg(func='main', msg="File 檢查結果更新失敗"))
+        
+    # update filename_check
+    if result_obj.update_result('filename_check', filename_check_result):
+        logger.info(format_func_msg(func='main', msg="File Name 檢查結果更新成功"))
+    else:
+        logger.error(format_func_msg(func='main', msg="File Name 檢查結果更新失敗"))
 
     # ------------------------------------------------------------ #
     

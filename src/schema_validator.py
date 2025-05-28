@@ -3,12 +3,10 @@ import configparser
 from pathlib import Path
 import logging
 from logger import setup_logger, format_func_msg
+from utils import LOG_PATH
 
-config = configparser.ConfigParser()
-config.read('config.ini')
-log_path = config['output_path']['log_path']
 
-logger = setup_logger(name=__name__, file_path=f'{log_path}/{__name__}.log')
+logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')
 
 def load_complex_schema(path: str | Path,
                         header_rows: list[int] = [2, 3],
@@ -54,8 +52,9 @@ def validate_data(file_type: str,
     Returns:
         dict: 驗證結果
     """
-
+    # 可以放在utils.py
     template_file = f"./data/std_template/增辦第4期-{file_type}.xlsx"
+    
 
     try:
         if file_type == "表單9":

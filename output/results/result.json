@@ -1,44 +1,92 @@
 [
     {
-        "name": "test.xlsx",
+        "name": "C:\\xiaofu\\工作\\2025\\國家住宅及都市管理中心\\付款清冊清理\\paybility\\data\\41期\\114年\\台中\\3月\\[enc]表4_棣寶41期出租人補助費用清冊_11403.xlsx",
         "result": {
+            "path_check": {
+                "status": {
+                    "status": true,
+                    "info": null,
+                    "message": "✅ 路徑格式正確"
+                },
+                "sub_status": {
+                    "period": {
+                        "status": true,
+                        "info": "41",
+                        "message": "✅ 期別正確"
+                    },
+                    "county": {
+                        "status": true,
+                        "info": "台中",
+                        "message": "✅ 縣市正確"
+                    },
+                    "year": {
+                        "status": true,
+                        "info": 114,
+                        "message": "✅ 年限正確"
+                    },
+                    "month": {
+                        "status": true,
+                        "info": 3,
+                        "message": "✅ 月份正確"
+                    }
+                }
+            },
             "file_check": {
                 "status": {
-                    "status": "True",
+                    "status": true,
+                    "info": null,
                     "message": "✅ 檔案格式正確"
                 },
                 "sub_status": {
                     "suffix": {
-                        "status": "True",
+                        "status": true,
+                        "info": ".xlsx",
                         "message": "✅ 副檔名正確"
                     },
                     "exist": {
-                        "status": "True",
+                        "status": true,
+                        "info": null,
                         "message": "✅ 檔案存在"
                     },
-                    "path": {
-                        "status": "True",
-                        "message": "✅ 路徑正確"
-                    },
                     "readable": {
-                        "status": "True",
-                        "message": "✅ 可讀取"
+                        "status": true,
+                        "info": "棣寶",
+                        "message": "✅ 讀取成功"
+                    }
+                }
+            },
+            "filename_check": {
+                "status": {
+                    "status": true,
+                    "info": "[enc]表4_棣寶41期出租人補助費用清冊_11403.xlsx",
+                    "message": "✅ 檔案名稱正確"
+                },
+                "sub_status": {
+                    "table": {
+                        "status": true,
+                        "info": "表4",
+                        "message": "✅ 表單正確"
+                    },
+                    "companycode": {
+                        "status": true,
+                        "info": "棣寶",
+                        "message": "✅ 公司名稱/代號相符"
                     }
                 }
             },
             "schema_check": {
                 "status": {
-                    "status": "True",
-                    "message": "✅ 欄位結構正確"
+                    "status": "False",
+                    "message": "❌ 讀取欄位結構失敗！錯誤訊息: 'NoneType' object is not subscriptable"
                 },
                 "sub_status": {
                     "entity_code": {
-                        "status": "True",
-                        "message": "✅ 業者代碼正確"
+                        "status": "False",
+                        "message": "❌ 無法驗證業者代碼！"
                     },
                     "column_name": {
-                        "status": "True",
-                        "message": "✅ 欄位名稱及順序正確"
+                        "status": "False",
+                        "message": "❌ 無法驗證欄位名稱！"
                     }
                 }
             }

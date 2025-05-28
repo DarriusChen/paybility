@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, Any
 from configparser import ConfigParser
 from logger import setup_logger, format_func_msg
+from utils import get_dict_template
 
 config = ConfigParser()
 config.read('config.ini')
@@ -28,22 +29,10 @@ class Result:
         return {
             "name": self.fname,
             "result": {
-                "file_check": {
-                    "status": {"status": "True", "message": "✅ 檔案格式正確"},
-                    "sub_status": {
-                        "suffix": {"status": "True", "message": "✅ 副檔名正確"},
-                        "exist": {"status": "True", "message": "✅ 檔案存在"},
-                        "path": {"status": "True", "message": "✅ 路徑正確"},
-                        "readable": {"status": "True", "message": "✅ 可讀取"}
-                    }
-                },
-                "schema_check": {
-                    "status": {"status": "True", "message": "✅ 欄位結構正確"},
-                    "sub_status": {
-                        "entity_code": {"status": "True", "message": "✅ 業者代碼正確"},
-                        "column_name": {"status": "True", "message": "✅ 欄位名稱及順序正確"}
-                    }
-                }
+                "path_check": get_dict_template("path_check"),
+                "file_check": get_dict_template("file_check"),
+                "filename_check": get_dict_template("filename_check"),
+                "schema_check": get_dict_template("schema_check")
             }
         }
 
@@ -57,7 +46,7 @@ class Result:
         Returns:
             bool: 是否成功更新結果
         """
-        if section not in ['file_check', 'schema_check']:
+        if section not in ['path_check', 'file_check', 'filename_check', 'schema_check']:
             logger.error(format_func_msg(func='update_result',
                                        msg=f"無效的 section: {section}"))
             return False
@@ -78,6 +67,7 @@ class Result:
         Returns:
             bool: 是否成功保存結果
         """
+        print(self.result)
         try:
             # 讀取現有結果
             try:
