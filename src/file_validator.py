@@ -22,7 +22,9 @@ def validate_path(path: str|Path):
     path = Path(path).resolve()
     
     pathinfo = check_path(path)
+    
     fileinfo = check_file(path)
+    
     filenameinfo = check_filename(path, fileinfo["sub_status"]["readable"]["info"])
     return pathinfo, fileinfo, filenameinfo
         

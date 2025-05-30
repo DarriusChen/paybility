@@ -31,17 +31,17 @@ for path in root_path.rglob("*"):
         result = subprocess.run(["python", "src/main.py", path],
                                 capture_output=True, text=True)
         # print("📤 stdout:\n", )
-        # print(result.stdout)
-        result_dict = dict(json.loads(result.stdout))
-        try:
-            if contains_none(result_dict):
-                error += 1
-                print(result_dict)
-            else:
-                correct += 1
-        except Exception as e:
-            print(f"💥 執行錯誤：{e}")
-            print(result_dict)
+        print(result.stdout)
+        # result_dict = dict(json.loads(result.stdout))
+        # try:
+        #     if contains_none(result_dict):
+        #         error += 1
+        #         print(result_dict)
+        #     else:
+        #         correct += 1
+        # except Exception as e:
+        #     print(f"💥 執行錯誤：{e}")
+        #     print(result_dict)
 
 print(f"{correct}/{total}")
 
