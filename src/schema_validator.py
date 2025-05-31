@@ -23,12 +23,12 @@ def load_complex_schema(path: str | Path,
     """
     try:
         df = pd.read_excel(path, sheet_name=sheet, header=header_rows)
-
         # → flatten MultiIndex columns and remove \n
         df.columns = [
             '_'.join(str(c).strip().replace('\n', '') for c in col if str(c) != 'nan')
             for col in df.columns.values
         ]
+        
     except Exception as e:
         logger.error(format_func_msg(func='load_complex_schema',
                                      msg=f"讀取檔案時發生錯誤: {e}"))
@@ -65,6 +65,7 @@ def validate_schema(file_type: str,
         elif file_type in ["表4", "表單4", "表7", "表單7"]:
             template_columns = load_complex_schema(path=template_file)[:14]
             data_columns = load_complex_schema(path=data_file)[:14]
+
     except Exception as e:
         logger.error(
             format_func_msg(func='validate_data', msg=f"讀取 schema 時發生錯誤: {e}"))
@@ -134,9 +135,11 @@ def validate_schema(file_type: str,
     if validation_passed:
         schema_result['status']['status'] = True
         schema_result['status']['message'] = "✅ 欄位結構正確"
+        
         schema_result['sub_status']['entity_code']['status'] = True
         schema_result['sub_status']['entity_code']['info'] = "業者代碼"
         schema_result['sub_status']['entity_code']['message'] = "✅ 業者代碼正確"
+        
         schema_result['sub_status']['column_name']['status'] = True
         schema_result['sub_status']['column_name']['info'] = f"{file_type}: {data_columns_len}"
         schema_result['sub_status']['column_name']['message'] = "✅ 欄位名稱及順序正確"

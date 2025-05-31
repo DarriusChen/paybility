@@ -67,7 +67,7 @@ class Result:
         Returns:
             bool: 是否成功保存結果
         """
-        print(self.result)
+        print(json.dumps(self.result, ensure_ascii=False, indent=2))
         try:
             # 讀取現有結果
             try:

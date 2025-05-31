@@ -3,7 +3,7 @@ from typing import Optional
 import os
 
 def setup_logger(name: str,
-                 level: int = logging.INFO,
+                 level: int = logging.DEBUG,
                  file_path: Optional[str] = None) -> logging.Logger:
     """設定 logger。
     

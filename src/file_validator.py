@@ -1,5 +1,4 @@
-import json
-import logging
+
 import pandas as pd
 import re
 
@@ -178,6 +177,7 @@ def is_vaild_table(name):
     return False, None, "❌ 表單錯誤"
 
 def is_same_companycode(filename, companycode):
+    companycode = is_nan(companycode)
     if companycode in filename:
         return True, companycode, "✅ 公司名稱/代號相符"
     else:
@@ -248,3 +248,10 @@ def is_int(s):
         return True
     except ValueError as e:
         return False
+
+def is_nan(n):
+    
+    if pd.isna(n):
+        return str(n)
+    else:
+        return n
