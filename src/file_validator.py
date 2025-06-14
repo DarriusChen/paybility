@@ -4,7 +4,7 @@ import re
 
 from pathlib import Path
 from logger import setup_logger, format_func_msg
-from utils import MAX_YEAR, MIN_YEAR, PERIOD, COUNTY, TABLES, LOG_PATH, get_dict_template
+from utils.utils import MAX_YEAR, MIN_YEAR, PERIOD, COUNTY, TABLES, LOG_PATH, get_dict_template, is_int, is_nan
 
 logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')
 
@@ -242,16 +242,3 @@ def is_valid_month(month):
     else:
         return False, None, "❌ 月份須為羅馬數字"
         
-def is_int(s):
-    try:
-        int(s)
-        return True
-    except ValueError as e:
-        return False
-
-def is_nan(n):
-    
-    if pd.isna(n):
-        return str(n)
-    else:
-        return n

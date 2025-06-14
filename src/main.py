@@ -5,7 +5,7 @@ from logger import setup_logger, format_func_msg
 from schema_validator import validate_schema
 from result import Result
 # config
-from utils import RESULT_PATH, LOG_PATH
+from utils.utils import RESULT_PATH, LOG_PATH
 
 logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')
 

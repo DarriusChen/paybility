@@ -3,7 +3,7 @@ import configparser
 from pathlib import Path
 import logging
 from logger import setup_logger, format_func_msg
-from utils import LOG_PATH, TEMPLETE_PATH, get_dict_template
+from utils.utils import LOG_PATH, TEMPLETE_PATH, get_dict_template
 
 
 logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')

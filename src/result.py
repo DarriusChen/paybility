@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, Any
 from configparser import ConfigParser
 from logger import setup_logger, format_func_msg
-from utils import get_dict_template
+from utils.utils import get_dict_template
 
 config = ConfigParser()
 config.read('config.ini')

@@ -1,4 +1,5 @@
 import configparser
+import pandas as pd
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -64,3 +65,16 @@ def get_dict_template(name: str):
         return None
     return template
     
+def is_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError as e:
+        return False
+
+def is_nan(n):
+    
+    if pd.isna(n):
+        return str(n)
+    else:
+        return n
