@@ -63,7 +63,7 @@ def main(args):
     logic_result_matching_numbers = validate_matching_numbers(
                                             data_file=args.filepath,
                                             logger=logger,
-                                            county=county,
+                                            # county=county,
                                             phase=period)
     if result_obj.update_result('logic_check_matching_numbers', logic_result_matching_numbers):
         logger.info(format_func_msg(func='main', msg="媒合編號 檢查結果更新成功"))

@@ -22,8 +22,8 @@ MAPPING_FILE = config['output_path']['mapping_file']
 # print(MAX_YEAR, MIN_TEAR, PERIOD, COUNTY, TABLES)
 
 #  result template
-def attribute():
-    return {"status": False, "info": None, "message": ""}
+def attribute(status=False, info=None, message=""):
+    return {"status": status, "info": info, "message": message}
 
 def get_dict_template(name: str):
     """回傳result模板
@@ -67,8 +67,33 @@ def get_dict_template(name: str):
         template["sub_status"] = sub_status
     elif name == "logic_check":
         sub_status = {
-            "matching_number": attribute()
+            
+            "error_row": attribute(info=[]), # 記錄所有error的list id
+            "match_number": attribute(), # 記錄每個row媒合編號的情況 
+            "recipient": attribute(), # 記錄每個row申請人/受款人的情況 Return bool, recipient_list([]), message
+            "case_unique": attribute(), # 記錄每個row案件的唯一性(表九) Return bool, casetype_list, message
+            "cash_unique": attribute(), # 記錄每個row金額的唯一性 Return bool, cashtype_list, message
+            "cash": attribute(), # 記錄每個row金額的情況 (not yet) Return bool, value_list, message
         }
+    elif name == "match_number_check":
+        sub_status = {
+            "id_company": attribute(),
+            "id_countycode": attribute(),
+            "type": attribute(),
+            "numbertype": attribute(),
+            "account": attribute(),
+        }
+
+        template["sub_status"] = sub_status
+    elif name == "recipient_check":
+        sub_status = {
+            "name": attribute(),
+            "id_name": attribute(),
+            "id_bank": attribute(),
+            "id_branch": attribute(),
+            "account": attribute(),
+        }
+
         template["sub_status"] = sub_status
     else:
         return None
