@@ -1,5 +1,8 @@
 import configparser
 import pandas as pd
+from pathlib import Path
+import logging
+from logger import format_func_msg
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -14,6 +17,7 @@ TABLES = config.get('path_parameter', 'tables').split(',')
 RESULT_PATH = config['output_path']['result_path']
 LOG_PATH = config['output_path']['log_path']
 TEMPLETE_PATH = config['output_path']['template_path']
+MAPPING_FILE = config['output_path']['mapping_file']
 
 # print(MAX_YEAR, MIN_TEAR, PERIOD, COUNTY, TABLES)
 
@@ -61,6 +65,11 @@ def get_dict_template(name: str):
             "column_name": attribute()
         }
         template["sub_status"] = sub_status
+    elif name == "logic_check":
+        sub_status = {
+            "matching_number": attribute()
+        }
+        template["sub_status"] = sub_status
     else:
         return None
     return template
@@ -78,3 +87,25 @@ def is_nan(n):
         return str(n)
     else:
         return n
+
+def load_data(path: str | Path,
+              header_rows: list[int],
+              sheet_name: str = 0,
+              index_col: list[int] = None,
+              logger: logging.Logger = None) -> pd.DataFrame:
+    """讀取資料。
+    
+    Args:
+        path: 檔案路徑
+    Returns:
+        pd.DataFrame: 資料
+    """
+    try:
+        df = pd.read_excel(path, sheet_name=sheet_name, header=header_rows, index_col=index_col)
+        logger.info(format_func_msg(func='load_data',
+                            msg=f"資料讀取成功: {path}"))
+        print(type(df))
+        return df
+    except Exception as e:
+        logger.error(format_func_msg(func='load_data', msg=f"讀取資料時發生錯誤: {e}"))
+        return None

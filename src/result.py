@@ -32,7 +32,8 @@ class Result:
                 "path_check": get_dict_template("path_check"),
                 "file_check": get_dict_template("file_check"),
                 "filename_check": get_dict_template("filename_check"),
-                "schema_check": get_dict_template("schema_check")
+                "schema_check": get_dict_template("schema_check"),
+                "logic_check_matching_numbers": get_dict_template("logic_check_matching_numbers")
             }
         }
 
@@ -46,7 +47,7 @@ class Result:
         Returns:
             bool: 是否成功更新結果
         """
-        if section not in ['path_check', 'file_check', 'filename_check', 'schema_check']:
+        if section not in ['path_check', 'file_check', 'filename_check', 'schema_check', 'logic_check_matching_numbers']:
             logger.error(format_func_msg(func='update_result',
                                        msg=f"無效的 section: {section}"))
             return False

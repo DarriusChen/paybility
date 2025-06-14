@@ -16,7 +16,8 @@ result_obj = Result(file_name=file_name, result_path=result_path)
 
 if __name__ == "__main__":
     result = validate_schema(
-        file_type="表單9",
-        data_file=data_file)
+        file_type="表9",
+        data_file=data_file,
+        county="台北市")
     result_obj.update_result('schema_check', result)
     result_obj.save_result()
