@@ -1,8 +1,10 @@
 import configparser
+import json
 import pandas as pd
 from pathlib import Path
 import logging
 from logger import format_func_msg
+from typing import Any, List
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -68,20 +70,24 @@ def get_dict_template(name: str):
     elif name == "logic_check":
         sub_status = {
             
-            "error_row": attribute(info=[]), # 記錄所有error的list id
-            "match_number": attribute(), # 記錄每個row媒合編號的情況 
-            "recipient": attribute(), # 記錄每個row申請人/受款人的情況 Return bool, recipient_list([]), message
-            "case_unique": attribute(), # 記錄每個row案件的唯一性(表九) Return bool, casetype_list, message
-            "cash_unique": attribute(), # 記錄每個row金額的唯一性 Return bool, cashtype_list, message
-            "cash": attribute(), # 記錄每個row金額的情況 (not yet) Return bool, value_list, message
+            "error_row": [], # 記錄所有error的list id
+            "match_number": [], # 記錄每個row媒合編號的情況 
+            "recipient": [], # 記錄每個row申請人/受款人的情況 
+            "cash_unique": [], # 記錄每個row金額的唯一性 
+            "case_unique": [], # 記錄每個row案件的唯一性(表九)
+            "date": [], # 記錄每個row時間的情況(表九)
+            "cash": [], # 記錄每個row金額的情況 (not yet) 
         }
-    elif name == "match_number_check":
+        template["sub_status"] = sub_status
+    elif name == "matchnumber_check":
         sub_status = {
-            "id_company": attribute(),
-            "id_countycode": attribute(),
-            "type": attribute(),
+            "matching_number": attribute(),
+            "county": attribute(),
+            "version": attribute(),
             "numbertype": attribute(),
-            "account": attribute(),
+            "contract": attribute(),
+            "periodtype": attribute(),
+            "serial_number": attribute()
         }
 
         template["sub_status"] = sub_status
@@ -92,6 +98,19 @@ def get_dict_template(name: str):
             "id_bank": attribute(),
             "id_branch": attribute(),
             "account": attribute(),
+        }
+
+        template["sub_status"] = sub_status
+    elif name == "unique_check":
+        sub_status = {
+            "unique": attribute(),
+        }
+
+        template["sub_status"] = sub_status
+    elif name == "date_check":
+        sub_status = {
+            "start": attribute(),
+            "end": attribute(),
         }
 
         template["sub_status"] = sub_status
@@ -134,3 +153,29 @@ def load_data(path: str | Path,
     except Exception as e:
         logger.error(format_func_msg(func='load_data', msg=f"讀取資料時發生錯誤: {e}"))
         return None
+
+def print_pretty(data: Any, keys: List[str] = ["info", "error_row", "match_number", "recipient", "case_unique", "cash_unique", "date", "cash"]):
+    # 標記指定欄位為 __ONELINE__
+    def mark_oneline(obj):
+        if isinstance(obj, dict):
+            return {
+                k: (
+                    "__ONELINE__" + json.dumps(v, ensure_ascii=False)
+                    if k in keys and isinstance(v, list)
+                    else mark_oneline(v)
+                )
+                for k, v in obj.items()
+            }
+        elif isinstance(obj, list):
+            return [mark_oneline(item) for item in obj]
+        return obj
+
+    # 將 __ONELINE__ 還原成原始 list 文字格式
+    def restore_oneline(json_str):
+        return json_str.replace('"__ONELINE__', '').replace(']"', ']')
+
+    # 處理流程
+    marked = mark_oneline(data)
+    dumped = json.dumps(marked, ensure_ascii=False, indent=4)
+    result = restore_oneline(dumped)
+    print(result)

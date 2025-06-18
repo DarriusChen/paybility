@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, Any
 from configparser import ConfigParser
 from logger import setup_logger, format_func_msg
-from utils.utils import get_dict_template
+from utils.utils import get_dict_template, print_pretty
 
 config = ConfigParser()
 config.read('config.ini')
@@ -33,7 +33,7 @@ class Result:
                 "file_check": get_dict_template("file_check"),
                 "filename_check": get_dict_template("filename_check"),
                 "schema_check": get_dict_template("schema_check"),
-                "logic_check_matching_numbers": get_dict_template("logic_check_matching_numbers")
+                "logic_check": get_dict_template("logic_check")
             }
         }
 
@@ -47,7 +47,7 @@ class Result:
         Returns:
             bool: 是否成功更新結果
         """
-        if section not in ['path_check', 'file_check', 'filename_check', 'schema_check', 'logic_check_matching_numbers']:
+        if section not in ['path_check', 'file_check', 'filename_check', 'schema_check', 'logic_check']:
             logger.error(format_func_msg(func='update_result',
                                        msg=f"無效的 section: {section}"))
             return False
@@ -68,7 +68,7 @@ class Result:
         Returns:
             bool: 是否成功保存結果
         """
-        print(json.dumps(self.result, ensure_ascii=False, indent=2))
+        print_pretty(self.result)
         try:
             # 讀取現有結果
             try:
@@ -92,3 +92,5 @@ class Result:
             logger.error(format_func_msg(func='save_result',
                                        msg=f"儲存驗證結果時發生錯誤: {e}"))
             return False
+        
+    
