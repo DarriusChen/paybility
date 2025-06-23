@@ -1,6 +1,6 @@
 from utils.utils import is_int, get_dict_template
 import numpy as np
-def valid_uniqueinfo(items: list):
+def valid_uniqueinfo(items: list, names: list):
     """檢查受款人資訊是否正確
     
     Args:

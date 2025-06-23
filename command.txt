@@ -3,3 +3,7 @@ python src\main.py [src]
 
 # 批次執行main.py 測試資料用
 python test.py
+
+# 啟動 Streamlit
+
+streamlit run src\test_streamlit.py
