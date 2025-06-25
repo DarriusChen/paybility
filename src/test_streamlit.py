@@ -1,4 +1,4 @@
-import test_streamlit as st
+import streamlit as st
 import json
 import pandas as pd
 from utils.utils import RESULT_PATH
