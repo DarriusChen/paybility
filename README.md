@@ -32,7 +32,7 @@
 - After installing streamlit, run:
 
 ```bash
-streamlit src/streamlit.py
+streamlit run src/streamlit.py
 ```
 
 ## File structure
