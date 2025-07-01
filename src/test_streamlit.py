@@ -83,6 +83,8 @@ def search_page():
         st.write(f"搜尋結果: {search_query}")
         st.write(st.session_state.period, st.session_state.table_type, st.session_state.city)
 
+# ------------------------------------------------------------#
+
 if __name__ == "__main__":
     page_names_to_funcs = {
         "Home": streamlit_app,
