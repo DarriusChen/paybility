@@ -36,12 +36,14 @@ def main(args):
     # ------------------------------------------------------------ #
     # print(file_check_result["sub_status"]["company_info"]["info"]["縣市"])
     # Step 2: schema check
+
+    data_frame = file_check_result["sub_status"]["readable"]["info"]
     file_type = file_check_result["sub_status"]["name"]["info"]["A"]
     # Todo 換成UI上選擇的結果
     county = file_check_result["sub_status"]["company_info"]["info"]["縣市"]
     company_code = file_check_result["sub_status"]["company_info"]["info"]["系統業者代號"]
     schema_result = validate_schema(file_type=file_type,
-                                    data_file=args.filepath,
+                                    data_file=data_frame,
                                     county=county,
                                     company_code=company_code)
     

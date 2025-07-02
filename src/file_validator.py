@@ -4,7 +4,7 @@ import re
 
 from pathlib import Path
 from logger import setup_logger, format_func_msg
-from utils.utils import MAX_YEAR, MIN_YEAR, PERIOD, COUNTY, MAPPING_FILE, TABLES, LOG_PATH, get_dict_template, is_int, load_data
+from utils.utils import MAX_YEAR, MIN_YEAR, PERIOD, COUNTY, MAPPING_FILE, TABLES, LOG_PATH, get_dict_template, is_int, load_data, load_schema
 
 logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')
 
@@ -43,7 +43,7 @@ def validate_path(path: str|Path):
     fileinfo["sub_status"]["exist"]["message"] = message 
     
     status, info, message = is_readable_file(path)
-    print(type(info), info)
+
     fileinfo["sub_status"]["readable"]["status"] = status
     fileinfo["sub_status"]["readable"]["info"] = info # 單個表的dataframe
     fileinfo["sub_status"]["readable"]["message"] = message 
@@ -154,14 +154,14 @@ def is_exist_file(file: Path):
         return False, None, "❌ 檔案不存在"
     
 def is_readable_file(file: Path):
-    try:
-        df = pd.read_excel(file, header=None) 
-        
-        return True, df.values.tolist(), "讀取成功"
-    except FileNotFoundError as e:
-        return False, None, f"❌ 檔案不存在: {e}"
-    except Exception as e:
-        return False, None, f"❌ 讀取失敗: {e}"
+    head = load_schema(file, header_rows=[1])
+    df = load_schema(file, header_rows=[1])
+    if df != None and head != None:
+       
+        return True, [head, df], "✅ 讀取成功"
+    
+    else:
+        return False, None, f"❌ 讀取失敗: {head} / {df}"
     
 def is_valid_period(period: str):
     # period check

@@ -4,49 +4,21 @@ from pathlib import Path
 import logging
 from logger import setup_logger, format_func_msg
 
-from utils.utils import LOG_PATH, TEMPLETE_PATH, get_dict_template, load_data, MAPPING_FILE
+from utils.utils import LOG_PATH, TEMPLETE_PATH, get_dict_template, load_data, load_schema, MAPPING_FILE
 
 
 logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')
 
 # TODO: 業者代碼資料庫
-# 2025/07/02: 此功能移至 filevalidatorpy
+# 2025/07/02: 此功能移至 filevalidator
 # # entity_mapping_df = load_data(path=MAPPING_FILE,
 #                         sheet_name="4-1",
 #                         header_rows=[0],
 #                         index_col=[0],
 #                         logger=logger)
 
-def load_complex_schema(path: str | Path,
-                        header_rows: list[int] = [2, 3],
-                        sheet: int = 0) -> list[str]:
-    """讀取雙層表頭並攤平成單層欄位。
-    
-    Args:
-        path: 檔案路徑
-        header_rows: 表頭行數
-        sheet: 工作表索引
-        
-    Returns:
-        pd.DataFrame: 攤平後的 DataFrame
-    """
-    try:
-        df = pd.read_excel(path, sheet_name=sheet, header=header_rows)
-        # → flatten MultiIndex columns and remove \n
-        df.columns = [
-            '_'.join(str(c).strip().replace('\n', '') for c in col if str(c) != 'nan')
-            for col in df.columns.values
-        ]
-        
-    except Exception as e:
-        logger.error(format_func_msg(func='load_complex_schema',
-                                     msg=f"讀取檔案時發生錯誤: {e}"))
-        return None
+# 2025/07/02: move to file validator
 
-    logger.info(format_func_msg(func='load_complex_schema',
-                                msg=f"檔案讀取成功: {path}"))
-
-    return df.columns.tolist()
 
 # not use 2025/07/02
 # def validate_entity_code(county: str, entity_code: str) -> bool:
@@ -70,7 +42,7 @@ def load_complex_schema(path: str | Path,
 
 
 def validate_schema(file_type: str,
-                  data_file: str | Path,
+                  data_file: list,
                   county: str,
                   company_code: str,
                   logger: logging.Logger = logger) -> dict:
@@ -89,14 +61,13 @@ def validate_schema(file_type: str,
 
     schema_result = get_dict_template("schema_check")
     
-    print(file_type)
     try:
         if file_type == "表9":
-            template_columns = load_complex_schema(path=template_file)[:20]
-            data_columns = load_complex_schema(path=data_file)[:20]
+            template_columns = load_schema(path=template_file)[:20]
+            data_columns = data_file[1][:20]
         elif file_type == "表4" or file_type == "表7":
-            template_columns = load_complex_schema(path=template_file)[:14]
-            data_columns = load_complex_schema(path=data_file)[:14]
+            template_columns = load_schema(path=template_file)[:14]
+            data_columns = data_file[1][:14]
 
     except Exception as e:
         logger.error(
@@ -163,12 +134,13 @@ def validate_schema(file_type: str,
         validation_passed = False
 
     # 驗證業者代碼是否符合格式
-    schema_result['sub_status']['entity_code']['status'] = False
-    df_entity_result = load_data(path=data_file,
-                                 header_rows=[1],
-                                 logger=logger
-                                 )
-    entity_info = df_entity_result.columns.tolist()
+    
+    # df_entity_result = load_data(path=data_file,
+    #                              header_rows=[1],
+    #                              logger=logger
+    #                              )
+    
+    entity_info = data_file[0]
     if "業者" in entity_info[0]:
         entity_code = entity_info[2]
         # print(entity_code, company_code)
@@ -180,6 +152,7 @@ def validate_schema(file_type: str,
             schema_result['sub_status']['entity_code']['info'] = f"錯誤業者代碼({company_code}): {entity_code}"
             schema_result['sub_status']['entity_code']['message'] = "❌ 業者代碼錯誤，請確認業者代碼是否正確"
             validation_passed = False
+
         # if not validate_entity_code(county=county, entity_code=entity_code):
         #     schema_result['sub_status']['entity_code']['info'] = f"錯誤業者代碼: {entity_code}"
         #     schema_result['sub_status']['entity_code']['message'] = "❌ 業者代碼錯誤，請確認業者代碼是否正確"
@@ -189,6 +162,7 @@ def validate_schema(file_type: str,
         #     schema_result['sub_status']['entity_code']['info'] = entity_code
         #     schema_result['sub_status']['entity_code']['message'] = "✅ 業者代碼正確"
     else:
+        schema_result['sub_status']['entity_code']['status'] = False
         schema_result['sub_status']['entity_code']['info'] = entity_info[0]
         schema_result['sub_status']['entity_code']['message'] = f"❌ 業者代碼欄位名稱錯誤: {entity_info[0]} - {entity_info[2]}"
         validation_passed = False

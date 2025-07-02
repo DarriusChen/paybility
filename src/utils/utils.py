@@ -149,6 +149,33 @@ def load_data(path: str | Path,
         logger.error(format_func_msg(func='load_data', msg=f"讀取資料時發生錯誤: {e}"))
 
         return None
+    
+def load_schema(path: str | Path,
+                header_rows: list[int] = [2, 3],
+                sheet: int = 0) -> list[str]:
+    """讀取雙層表頭並攤平成單層欄位。
+    
+    Args:
+        path: 檔案路徑
+        header_rows: 表頭行數
+        sheet: 工作表索引
+        
+    Returns:
+        pd.DataFrame: 攤平後的 DataFrame
+    """
+    try:
+        df = pd.read_excel(path, sheet_name=sheet, header=header_rows)
+        # → flatten MultiIndex columns and remove \n
+        df.columns = [
+            '_'.join(str(c).strip().replace('\n', '') for c in col if str(c) != 'nan')
+            for col in df.columns.values
+        ]
+        
+    except Exception as e:
+
+        return e
+
+    return df.columns.tolist()
 
 def print_pretty(data: Any, keys: List[str] = ["info", "error_row", "match_number", "recipient", "case_unique", "cash_unique", "date", "cash"]):
     # 標記指定欄位為 __ONELINE__
