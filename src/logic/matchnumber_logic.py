@@ -30,8 +30,18 @@ def valid_matching_number(matching_code: str, phase: str) -> dict:
     match = re.match(pattern, matching_code)
 
     if match:
+        company_name, county_code, version, numbertype, contract, period_type, serial_number = match.groups()
+
         result["status"]["status"] = True
-        result["status"]["info"] = None
+        result["status"]["info"] = {
+            "company_name": company_name,
+            "county_code": county_code,
+            "version": version,
+            "numbertype": numbertype,
+            "contract": contract,
+            "period_type": period_type,
+            "serial_number": serial_number
+        }
         result["status"]["message"] = "✅ 格式正確"
     else:
         result["status"]["status"] = False
@@ -43,63 +53,67 @@ def valid_matching_number(matching_code: str, phase: str) -> dict:
         dealer_pattern = r"^([\u4e00-\u9fff]{1,4})"
         dealer_match = re.match(dealer_pattern, matching_code)
         
-        if not dealer_match:
-            # errors.append(f"業者名稱格式錯誤: {matching_code}。業者名稱須為1~4個中文字")
-            result["sub_status"]["matching_code"]["status"] = False
-            result["sub_status"]["matching_code"]["info"] = matching_code
-            result["sub_status"]["matching_code"]["message"] = "❌ 業者名稱格式錯誤"
+        if dealer_match:
+            result["sub_status"]["match_number"]["status"] = True
+            result["sub_status"]["match_number"]["info"] = matching_code
+            result["sub_status"]["match_number"]["message"] = "✅ 業者名稱格式正確"
+            
         else:
-            result["sub_status"]["matching_code"]["status"] = True
-            result["sub_status"]["matching_code"]["info"] = matching_code
-            result["sub_status"]["matching_code"]["message"] = "✅ 業者名稱格式正確"
+            # errors.append(f"業者名稱格式錯誤: {matching_code}。業者名稱須為1~4個中文字")
+            result["sub_status"]["match_number"]["status"] = False
+            result["sub_status"]["match_number"]["info"] = matching_code
+            result["sub_status"]["match_number"]["message"] = "❌ 業者名稱格式錯誤"
 
-        dealer_name = dealer_match.group(1)
-        remaining = matching_code[len(dealer_name):]
+            if dealer_match == None:
+                return result
+            # print(dealer_match.group(0))
+            dealer_name = dealer_match.group(1)
+            remaining = matching_code[len(dealer_name):]
 
-        status, info, message = is_county(remaining)
-        result["sub_status"]["county"]["status"] = status
-        result["sub_status"]["county"]["info"] = info
-        result["sub_status"]["county"]["message"] = message
-        if info =="break":
-            return result
-        remaining = remaining[1:]
+            status, info, message = is_county(remaining)
+            result["sub_status"]["county"]["status"] = status
+            result["sub_status"]["county"]["info"] = info
+            result["sub_status"]["county"]["message"] = message
+            if info =="break":
+                return result
+            remaining = remaining[1:]
 
-        status, info, message = is_version(remaining)
-        result["sub_status"]["version"]["status"] = status
-        result["sub_status"]["version"]["info"] = info
-        result["sub_status"]["version"]["message"] = message
-        if info =="break":
-            return result
-        remaining = remaining[1:]
+            status, info, message = is_version(remaining)
+            result["sub_status"]["version"]["status"] = status
+            result["sub_status"]["version"]["info"] = info
+            result["sub_status"]["version"]["message"] = message
+            if info =="break":
+                return result
+            remaining = remaining[1:]
 
-        status, info, message = is_numbertype(remaining)
-        result["sub_status"]["numbertype"]["status"] = status
-        result["sub_status"]["numbertype"]["info"] = info
-        result["sub_status"]["numbertype"]["message"] = message
-        if info =="break":
-            return result
-        remaining = remaining[1:]
+            status, info, message = is_numbertype(remaining)
+            result["sub_status"]["numbertype"]["status"] = status
+            result["sub_status"]["numbertype"]["info"] = info
+            result["sub_status"]["numbertype"]["message"] = message
+            if info =="break":
+                return result
+            remaining = remaining[1:]
 
-        status, info, message = is_contract(remaining)
-        result["sub_status"]["contract"]["status"] = status
-        result["sub_status"]["contract"]["info"] = info
-        result["sub_status"]["contract"]["message"] = message
-        if info =="break":
-            return result
-        remaining = remaining[1:]
+            status, info, message = is_contract(remaining)
+            result["sub_status"]["contract"]["status"] = status
+            result["sub_status"]["contract"]["info"] = info
+            result["sub_status"]["contract"]["message"] = message
+            if info =="break":
+                return result
+            remaining = remaining[1:]
 
-        status, info, message = is_periodtype(remaining, phase)
-        result["sub_status"]["periodtype"]["status"] = status
-        result["sub_status"]["periodtype"]["info"] = info
-        result["sub_status"]["periodtype"]["message"] = message
-        if info =="break":
-            return result
-        remaining = remaining[1:]
+            status, info, message = is_periodtype(remaining, phase)
+            result["sub_status"]["periodtype"]["status"] = status
+            result["sub_status"]["periodtype"]["info"] = info
+            result["sub_status"]["periodtype"]["message"] = message
+            if info =="break":
+                return result
+            remaining = remaining[1:]
 
-        status, info, message = is_serial_number(remaining)
-        result["sub_status"]["serial_number"]["status"] = status
-        result["sub_status"]["serial_number"]["info"] = info
-        result["sub_status"]["serial_number"]["message"] = message
+            status, info, message = is_serial_number(remaining)
+            result["sub_status"]["serial_number"]["status"] = status
+            result["sub_status"]["serial_number"]["info"] = info
+            result["sub_status"]["serial_number"]["message"] = message
        
     return result
 

@@ -16,40 +16,34 @@ parser.add_argument('filepath', type=str, help='.xls path')
 
 def main(args):
     
+    # Todo: 以下這些之後定案可以統整成一個dict
+    # file_type = file_check_result["sub_status"]["name"]["info"]["A"]
+    # # Todo 換成UI上選擇的結果
+    # county = file_check_result["sub_status"]["company_info"]["info"]["縣市"]
+    # company_code = file_check_result["sub_status"]["company_info"]["info"]["系統業者代號"]
+
     # 創建 Result object
     result_obj = Result(file_name=args.filepath, result_path=RESULT_PATH)
-    
     # Step 1: file check
-    # pv = PathValidator(args) # TODO: 傳入 result_obj
-    path_check_result, file_check_result, filename_check_result = validate_path(args.filepath)
-    
-    # 更新 File level 檢查結果
-    # update path_check
-    if result_obj.update_result('path_check', path_check_result):
-        logger.info(format_func_msg(func='main', msg="Path 檢查結果更新成功"))
-    else:
-        logger.error(format_func_msg(func='main', msg="Path 檢查結果更新失敗"))
-        
+    file_check_result = validate_path(args.filepath)
+
     # update file_check
     if result_obj.update_result('file_check', file_check_result):
         logger.info(format_func_msg(func='main', msg="File 檢查結果更新成功"))
     else:
         logger.error(format_func_msg(func='main', msg="File 檢查結果更新失敗"))
-        
-    # update filename_check
-    if result_obj.update_result('filename_check', filename_check_result):
-        logger.info(format_func_msg(func='main', msg="File Name 檢查結果更新成功"))
-    else:
-        logger.error(format_func_msg(func='main', msg="File Name 檢查結果更新失敗"))
-
+    # 檔案名稱要對才能繼續往下...
     # ------------------------------------------------------------ #
-    
+    # print(file_check_result["sub_status"]["company_info"]["info"]["縣市"])
     # Step 2: schema check
-    file_type = filename_check_result["sub_status"]["table"]["info"]
-    county = path_check_result["sub_status"]["county"]["info"]
+    file_type = file_check_result["sub_status"]["name"]["info"]["A"]
+    # Todo 換成UI上選擇的結果
+    county = file_check_result["sub_status"]["company_info"]["info"]["縣市"]
+    company_code = file_check_result["sub_status"]["company_info"]["info"]["系統業者代號"]
     schema_result = validate_schema(file_type=file_type,
                                     data_file=args.filepath,
-                                    county=county)
+                                    county=county,
+                                    company_code=company_code)
     
     # 更新 Schema 檢查結果
     if result_obj.update_result('schema_check', schema_result):
@@ -59,7 +53,7 @@ def main(args):
 
     # ------------------------------------------------------------ #
     # Step 3: logic check -1: 媒合編號
-    period = path_check_result["sub_status"]["period"]["info"]
+    period = file_check_result["sub_status"]["name"]["info"]["C"]
     logic_result = validate_logic(
                                     data_file=args.filepath,
                                     logger=logger,
@@ -72,6 +66,7 @@ def main(args):
         logger.error(format_func_msg(func='main', msg="媒合編號 檢查結果更新失敗"))
 
     
+
 
     # ------------------------------------------------------------ #
     # Step 4:  

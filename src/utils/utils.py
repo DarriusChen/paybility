@@ -32,33 +32,20 @@ def get_dict_template(name: str):
 
     Args:
         name (str): 模板名稱:
-            'path_check', 'file_check', 'filename_check', 'schema_check'
+            'path_check', 'file_check', 'schema_check'
 
     Returns:
         dict: result模板
     """
     template = {"status": attribute()}
     
-    if name == "path_check":
+    if name == "file_check":
         sub_status = {
-            "period": attribute(),
-            "county": attribute(),
-            "year": attribute(),
-            "month": attribute()
-        }
-        template["sub_status"] = sub_status
-    elif name == "file_check":
-        sub_status = {
+            "name": attribute(),
             "suffix": attribute(),
             "exist": attribute(),
-            "readable": attribute()
-        }
-        template["sub_status"] = sub_status
-    elif name == "filename_check":
-        sub_status = {
-            "table":attribute(),
-            "companycode": attribute()
-            
+            "readable": attribute(),
+            "company_info": attribute()
         }
         template["sub_status"] = sub_status
     elif name == "schema_check":
@@ -76,12 +63,12 @@ def get_dict_template(name: str):
             "cash_unique": [], # 記錄每個row金額的唯一性 
             "case_unique": [], # 記錄每個row案件的唯一性(表九)
             "date": [], # 記錄每個row時間的情況(表九)
-            "cash": [], # 記錄每個row金額的情況 (not yet) 
+            "fee": [], # 記錄每個row金額的情況 (not yet) 
         }
         template["sub_status"] = sub_status
     elif name == "matchnumber_check":
         sub_status = {
-            "matching_number": attribute(),
+            "match_number": attribute(),
             "county": attribute(),
             "version": attribute(),
             "numbertype": attribute(),
@@ -111,6 +98,14 @@ def get_dict_template(name: str):
         sub_status = {
             "start": attribute(),
             "end": attribute(),
+        }
+
+        template["sub_status"] = sub_status
+    elif name == "fee_check":
+        sub_status = {
+            "fee": attribute(),
+            "period": attribute(),
+            "apply": attribute(),
         }
 
         template["sub_status"] = sub_status
@@ -148,10 +143,11 @@ def load_data(path: str | Path,
         df = pd.read_excel(path, sheet_name=sheet_name, header=header_rows, index_col=index_col)
         logger.info(format_func_msg(func='load_data',
                             msg=f"資料讀取成功: {path}"))
-        print(type(df))
+
         return df
     except Exception as e:
         logger.error(format_func_msg(func='load_data', msg=f"讀取資料時發生錯誤: {e}"))
+
         return None
 
 def print_pretty(data: Any, keys: List[str] = ["info", "error_row", "match_number", "recipient", "case_unique", "cash_unique", "date", "cash"]):

@@ -68,7 +68,7 @@ class Result:
         Returns:
             bool: 是否成功保存結果
         """
-        print_pretty(self.result)
+        # print_pretty(self.result)
         try:
             # 讀取現有結果
             try:

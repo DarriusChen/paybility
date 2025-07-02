@@ -10,11 +10,12 @@ from utils.utils import LOG_PATH, TEMPLETE_PATH, get_dict_template, load_data, M
 logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')
 
 # TODO: 業者代碼資料庫
-entity_mapping_df = load_data(path=MAPPING_FILE,
-                        sheet_name="4-1",
-                        header_rows=[0],
-                        index_col=[0],
-                        logger=logger)
+# 2025/07/02: 此功能移至 filevalidatorpy
+# # entity_mapping_df = load_data(path=MAPPING_FILE,
+#                         sheet_name="4-1",
+#                         header_rows=[0],
+#                         index_col=[0],
+#                         logger=logger)
 
 def load_complex_schema(path: str | Path,
                         header_rows: list[int] = [2, 3],
@@ -47,28 +48,31 @@ def load_complex_schema(path: str | Path,
 
     return df.columns.tolist()
 
-def validate_entity_code(county: str, entity_code: str) -> bool:
-    """驗證業者代碼是否符合格式。
+# not use 2025/07/02
+# def validate_entity_code(county: str, entity_code: str) -> bool:
+#     """驗證業者代碼是否符合格式。
     
-    Args:
-        entity_code: 業者代碼
-    Returns:
-        bool: 是否符合格式
-    """
-    try:
-        entity_names = entity_mapping_df.loc[(county)]["系統業者代號"].tolist()
-        if entity_code in entity_names:
-            return True
-        else:
-            return False
-    except Exception as e:
-        logger.error(format_func_msg(func='validate_entity_code', msg=f"讀取業者代碼時發生錯誤: {e}"))
-        return None
+#     Args:
+#         entity_code: 業者代碼
+#     Returns:
+#         bool: 是否符合格式
+#     """
+#     try:
+#         entity_names = entity_mapping_df.loc[(county)]["系統業者代號"].tolist()
+#         for name in entity_names:
+#             if entity_code == name:
+#                 return True
+#             else:
+#                 return False
+#     except Exception as e:
+#         logger.error(format_func_msg(func='validate_entity_code', msg=f"讀取業者代碼時發生錯誤: {e}"))
+#         return None
 
 
 def validate_schema(file_type: str,
                   data_file: str | Path,
                   county: str,
+                  company_code: str,
                   logger: logging.Logger = logger) -> dict:
     """驗證資料是否符合模板，並回傳驗證結果。
     
@@ -85,12 +89,12 @@ def validate_schema(file_type: str,
 
     schema_result = get_dict_template("schema_check")
     
-
+    print(file_type)
     try:
-        if file_type in ["表9", "表單9"]:
+        if file_type == "表9":
             template_columns = load_complex_schema(path=template_file)[:20]
             data_columns = load_complex_schema(path=data_file)[:20]
-        elif file_type in ["表4", "表單4", "表7", "表單7"]:
+        elif file_type == "表4" or file_type == "表7":
             template_columns = load_complex_schema(path=template_file)[:14]
             data_columns = load_complex_schema(path=data_file)[:14]
 
@@ -167,14 +171,23 @@ def validate_schema(file_type: str,
     entity_info = df_entity_result.columns.tolist()
     if "業者" in entity_info[0]:
         entity_code = entity_info[2]
-        if not validate_entity_code(county=county, entity_code=entity_code):
-            schema_result['sub_status']['entity_code']['info'] = f"錯誤業者代碼: {entity_code}"
-            schema_result['sub_status']['entity_code']['message'] = "❌ 業者代碼錯誤，請確認業者代碼是否正確"
-            validation_passed = False
-        else:
+        # print(entity_code, company_code)
+        if entity_code == company_code:
             schema_result['sub_status']['entity_code']['status'] = True
             schema_result['sub_status']['entity_code']['info'] = entity_code
             schema_result['sub_status']['entity_code']['message'] = "✅ 業者代碼正確"
+        else:
+            schema_result['sub_status']['entity_code']['info'] = f"錯誤業者代碼({company_code}): {entity_code}"
+            schema_result['sub_status']['entity_code']['message'] = "❌ 業者代碼錯誤，請確認業者代碼是否正確"
+            validation_passed = False
+        # if not validate_entity_code(county=county, entity_code=entity_code):
+        #     schema_result['sub_status']['entity_code']['info'] = f"錯誤業者代碼: {entity_code}"
+        #     schema_result['sub_status']['entity_code']['message'] = "❌ 業者代碼錯誤，請確認業者代碼是否正確"
+        #     validation_passed = False
+        # else:
+        #     schema_result['sub_status']['entity_code']['status'] = True
+        #     schema_result['sub_status']['entity_code']['info'] = entity_code
+        #     schema_result['sub_status']['entity_code']['message'] = "✅ 業者代碼正確"
     else:
         schema_result['sub_status']['entity_code']['info'] = entity_info[0]
         schema_result['sub_status']['entity_code']['message'] = f"❌ 業者代碼欄位名稱錯誤: {entity_info[0]} - {entity_info[2]}"
