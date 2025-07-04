@@ -3,6 +3,7 @@ import json
 import pandas as pd
 from utils.utils import RESULT_PATH
 import uuid
+from database import DatabaseService
 
 # 用 session_state 儲存日誌，避免每次重新執行就消失
 if "log_lines" not in st.session_state:
@@ -13,6 +14,9 @@ if 'show_result' not in st.session_state:
 
 if "file_uploader" not in st.session_state:
     st.session_state.file_uploader = str(uuid.uuid4())
+
+if "database_service" not in st.session_state:
+    st.session_state.database_service = DatabaseService()
 
 # Test function
 # TODO: 改成實際的驗證函數
@@ -85,10 +89,31 @@ def search_page():
 
 # ------------------------------------------------------------#
 
+def search_database():
+    st.title("🔍 資料庫查詢")
+    st.write("---")
+    left, middle, right = st.columns(3)
+
+    db = st.session_state.database_service
+
+    with left:
+        st.text_input(label="資料表名稱", key="table_name")
+    with middle:
+        st.text_input(label="資料表欄位", key="column_name")
+    with right:
+        st.text_input(label="資料表欄位值", key="value")
+    if st.button("搜尋"):
+        result, count = db.get_data(st.session_state.table_name, st.session_state.column_name, st.session_state.value)
+        st.write(f"搜尋結果: 共 {count} 筆資料")
+        st.write(result)
+
+# ------------------------------------------------------------#
+
 if __name__ == "__main__":
     page_names_to_funcs = {
         "Home": streamlit_app,
         "Search": search_page,
+        "Search Database": search_database,
     }
     page_name = st.sidebar.selectbox("選擇頁面", page_names_to_funcs.keys())
     page_names_to_funcs[page_name]()
