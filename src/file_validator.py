@@ -4,7 +4,7 @@ import re
 
 from pathlib import Path
 from logger import setup_logger, format_func_msg
-from utils.utils import MAX_YEAR, MIN_YEAR, PERIOD, COUNTY, MAPPING_FILE, TABLES, LOG_PATH, get_dict_template, is_int, load_data, load_schema
+from utils.utils import MAX_YEAR, MIN_YEAR, PERIOD, COUNTY, MAPPING_FILE, TABLES, LOG_PATH, get_dict_template, is_int,  load_schema
 
 logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')
 
@@ -155,10 +155,11 @@ def is_exist_file(file: Path):
     
 def is_readable_file(file: Path):
     head = load_schema(file, header_rows=[1])
-    df = load_schema(file, header_rows=[1])
-    if df != None and head != None:
+    schema = load_schema(file, header_rows=[2, 3])
+    df = load_schema(file, header_rows=0)
+    if df != None and schema != None and head != None:
        
-        return True, [head, df], "✅ 讀取成功"
+        return True, [head, schema, df], "✅ 讀取成功"
     
     else:
         return False, None, f"❌ 讀取失敗: {head} / {df}"

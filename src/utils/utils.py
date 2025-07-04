@@ -1,6 +1,7 @@
 import configparser
 import json
 import pandas as pd
+import numpy as np
 from pathlib import Path
 import logging
 from logger import format_func_msg
@@ -152,7 +153,7 @@ def load_data(path: str | Path,
     
 def load_schema(path: str | Path,
                 header_rows: list[int] = [2, 3],
-                sheet: int = 0) -> list[str]:
+                sheet: int = 0 ) -> list[str]:
     """讀取雙層表頭並攤平成單層欄位。
     
     Args:
@@ -166,16 +167,28 @@ def load_schema(path: str | Path,
     try:
         df = pd.read_excel(path, sheet_name=sheet, header=header_rows)
         # → flatten MultiIndex columns and remove \n
-        df.columns = [
-            '_'.join(str(c).strip().replace('\n', '') for c in col if str(c) != 'nan')
-            for col in df.columns.values
-        ]
+        if header_rows == [1]:
+            df.columns = [
+                ''.join(str(c).strip().replace('\n', '') for c in col if str(c) != 'nan')
+                for col in df.columns.values
+            ]
+            return df.columns.tolist()
+        elif header_rows == [2, 3]:
+
+            df.columns = [
+                '_'.join(str(c).strip().replace('\n', '') for c in col if str(c) != 'nan')
+                for col in df.columns.values
+            ]
+            return df.columns.tolist()
+        else:
+            return np.where(pd.isna(df), '', df).tolist()
+
         
     except Exception as e:
 
         return e
 
-    return df.columns.tolist()
+    
 
 def print_pretty(data: Any, keys: List[str] = ["info", "error_row", "match_number", "recipient", "case_unique", "cash_unique", "date", "cash"]):
     # 標記指定欄位為 __ONELINE__

@@ -13,7 +13,7 @@ county_code_dict = {
 }
 # TODO: 縣市代碼資料庫
 
-def valid_matching_number(matching_code: str, phase: str) -> dict:
+def valid_matching_number(matching_code: str, phase: str, county_code_:str) -> dict:
     """
     驗證媒合編號是否符合格式。
     
@@ -26,12 +26,10 @@ def valid_matching_number(matching_code: str, phase: str) -> dict:
 
     result = get_dict_template("matchnumber_check")
     
-    pattern = r"^([\u4e00-\u9fff]{1,4})([A-F]{1})([12])(M)([123])(2|3|31|4|41)(\d{5})$"
+    pattern = rf"^([\u4e00-\u9fff]{{1,4}})({county_code_})([12])(M)([123])(2|3|31|4|41)(\d{{5}})$"
     match = re.match(pattern, matching_code)
-
     if match:
         company_name, county_code, version, numbertype, contract, period_type, serial_number = match.groups()
-
         result["status"]["status"] = True
         result["status"]["info"] = {
             "company_name": company_name,
@@ -70,7 +68,7 @@ def valid_matching_number(matching_code: str, phase: str) -> dict:
             dealer_name = dealer_match.group(1)
             remaining = matching_code[len(dealer_name):]
 
-            status, info, message = is_county(remaining)
+            status, info, message = is_county(remaining, county_code_) 
             result["sub_status"]["county"]["status"] = status
             result["sub_status"]["county"]["info"] = info
             result["sub_status"]["county"]["message"] = message
@@ -117,14 +115,14 @@ def valid_matching_number(matching_code: str, phase: str) -> dict:
        
     return result
 
-def is_county(remaining):
+def is_county(remaining, company_code):
     # 2. 檢查縣市代號（A-F）
     if len(remaining) == 0:
         # errors.append("縣市代碼開始出現缺漏！請檢媒合編號是否正確")
         return False, "break", "❌ 縣市代碼開始出現缺漏！請檢媒合編號是否正確"
-    elif remaining[0] not in county_code_dict.values():
+    elif remaining[0] != company_code:
         # errors.append(f"縣市代號缺漏或格式錯誤: {remaining[0]}。縣市代號須為 A-F")
-        return False, None, f"❌ 縣市代號缺漏或格式錯誤: {remaining[0]}。縣市代號須為 A-F"
+        return False, None, f"❌ 縣市代號錯誤: {remaining[0]}。縣市代號須為 A-F"
     elif len(remaining) > 11 or len(remaining) < 10:
         # errors.append(f"縣市代碼後長度不符: {remaining}！請檢查媒合編號是否正確")
         return False, None, f"❌ 縣市代碼後長度不符: {remaining}！請檢查媒合編號是否正確"

@@ -12,16 +12,13 @@ import os
 
 logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')
 
-def validate_logic(data_file: str | Path,
-                    logger: logging.Logger,
-                    tabletype: str,
-                    phase: str) -> dict:
+def validate_logic(dataframe: list,
+                    file_type: str,
+                    phase: str, 
+                    county: str,
+                    county_code: str) -> dict:
     
     logic_result = get_dict_template("logic_check")
-    
-    df = load_data(path=data_file,
-                    header_rows=[2, 3],
-                    logger=logger)
 
     error_list = []
     match_number_list = []
@@ -31,8 +28,10 @@ def validate_logic(data_file: str | Path,
     cash_list = []
     date_list = []
 
-    for index, row_content in df.iterrows():
-        if tabletype in ["表4", "表單4", "表四", "表單四"]:
+    for row_content in dataframe[2]:
+        
+        
+        if file_type == "表4":
             row, number, insurance_apply, insurance_fee, notarization_apply, notarization_fee, repair_apply, repair_fee, name, id_name, id_bank, id_branch, account = row_content[:13]
             
             # 通表檢查 媒合編號邏輯
@@ -46,9 +45,6 @@ def validate_logic(data_file: str | Path,
                 # 期別檢查
                 # period_result = valid_periodinfo() # not yet
 
-                # print(match_number_result, recipient_result, unique_result)
-
-                # os.system("pause")
 
                 match_number_list.append(match_number_result)
                 recipient_list.append(recipient_result)
@@ -62,13 +58,14 @@ def validate_logic(data_file: str | Path,
                     unique_result["status"]["status"]):
                     error_list.append(row)
 
-        elif tabletype in ["表7", "表單7", "表七", "表單七"]:
+        elif file_type == "表7":
+            
             row, number, notarization_apply, notarization_fee, rental_fee, rental_period, rental_totalperiod, rental_type, name, id_name, id_bank, id_branch, account = row_content[:13]
             
             # 通表檢查 媒合編號邏輯
-            match_number_result = valid_matching_number(str(number), phase)
+            match_number_result = valid_matching_number(str(number), phase, county_code)
             if match_number_result["status"]["status"]:
-
+                print(row_content)
                 # 受款人檢查
                 recipient_result = valid_recipientinfo([name, id_name, str(int(id_bank)), str(int(id_branch)), str(int(account))])
                 # 費用唯一性檢查
@@ -86,7 +83,7 @@ def validate_logic(data_file: str | Path,
                     unique_result["status"]["status"]):
                     error_list.append(row)
 
-        elif tabletype in ["表9", "表單9", "表九", "表單九"]:
+        elif file_type in "表9":
             row, number, case_1, case_2, case_3, case_4, case_5, case_6, date_start, date_end, notarization_fee, development_fee, management_fee, management_period, management_totalperiod, matching_fee, custody_fee, custody_period, custody_totalperiod = row_content[:19]
             
             # 通表檢查 媒合編號邏輯
@@ -114,7 +111,7 @@ def validate_logic(data_file: str | Path,
                     error_list.append(row)
         else:
             logic_result["status"]["status"] = False
-            logic_result["status"]["info"] = tabletype
+            logic_result["status"]["info"] = file_type
             logic_result["status"]["message"] = "❌ 表單錯誤"
 
     logic_result["sub_status"]["error_row"] = error_list
