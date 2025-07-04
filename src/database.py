@@ -11,11 +11,12 @@ class DatabaseService:
         # pyodbc 連接設定 (用於存儲過程和複雜查詢)
         self.driver = "{ODBC Driver 18 for SQL Server}"
         self.server = config["database"]["host"]
+        self.user = config["database"]["user"]
         self.pwd = config["database"]["password"]
         self.db_name = config["database"]["database"]
         self.connection_string = (
             f"DRIVER={self.driver};SERVER={self.server};"
-            f"DATABASE={self.db_name};UID=sa;PWD={self.pwd};"
+            f"DATABASE={self.db_name};UID={self.user};PWD={self.pwd};"
             "TrustServerCertificate=yes;Encrypt=yes;"
         )
 
