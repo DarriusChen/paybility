@@ -12,6 +12,22 @@ county_code_dict = {
     "高雄市": "F",
 }
 # TODO: 縣市代碼資料庫
+version_dict = {
+    "1": "縣市版",
+    "2": "公會版" 
+}
+
+numbertype_dict = {
+    "M": "媒合編號",
+    "T": "房客編號",
+    "H": "物件編號"
+}
+
+contract_dict = {
+    "1": "代租",
+    "2": "轉租",
+    "3": "包租"
+}
 
 def valid_matching_number(matching_code: str, phase: str, county_code_:str) -> dict:
     """
@@ -21,7 +37,7 @@ def valid_matching_number(matching_code: str, phase: str, county_code_:str) -> d
         matching_code: 媒合編號
         phase: 計畫期別
     Returns:
-        bool: 是否符合格式
+        dict
     """
 
     result = get_dict_template("matchnumber_check")
@@ -127,11 +143,12 @@ def is_county(remaining, company_code):
         # errors.append(f"縣市代碼後長度不符: {remaining}！請檢查媒合編號是否正確")
         return False, None, f"❌ 縣市代碼後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
-        return True, None, "✅ 縣市代碼正確"
+        return True, county_code_dict[remaining[0]], "✅ 縣市代碼正確"
         # remaining = remaining[1:]
 
 def is_version(remaining):
     # 3. 檢查縣市/公會版（1或2）
+    
     if len(remaining) == 0:
         # errors.append("縣市版／公會版代碼開始出現缺漏！請檢媒合編號是否正確")
         return False, "break", "❌ 縣市版／公會版代碼開始出現缺漏！請檢媒合編號是否正確"
@@ -142,7 +159,7 @@ def is_version(remaining):
         # errors.append(f"縣市版或公會版代碼後長度不符: {remaining}！請檢查媒合編號是否正確")
         return False, None, f"❌ 縣市版或公會版代碼後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
-        return False, None, f"✅ 縣市版／公會版代碼正確"
+        return False, version_dict[remaining[0]], f"✅ 縣市版／公會版代碼正確"
         # remaining = remaining[1:]
 
 def is_numbertype(remaining):
@@ -158,7 +175,7 @@ def is_numbertype(remaining):
         return False, None, f"❌ 媒合編號後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
         # remaining = remaining[1:]
-        return True, None, f"✅ 媒合編號正確"
+        return True, numbertype_dict[remaining[0]], f"✅ 媒合編號正確"
 
 def is_contract(remaining):
     # 5. 檢查契約類型（1、2或3）
@@ -174,7 +191,7 @@ def is_contract(remaining):
         return False, None, f"❌ 契約類型後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
         # remaining = remaining[1:]
-        return True, None, f"✅ 契約類型正確"
+        return True, contract_dict[remaining[0]], f"✅ 契約類型正確"
 
 def is_periodtype(remaining, phase):
     # 6. 檢查計畫期別（2、3、31、4、41）
@@ -189,7 +206,7 @@ def is_periodtype(remaining, phase):
         return False, None, f"❌ 計畫期別後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
         # remaining = remaining[len(phase):]
-        return True, None, "✅ 計畫期別正確"
+        return True, phase, "✅ 計畫期別正確"
 
 def is_serial_number(remaining):
     # 7. 檢查流水號（5位數字）
@@ -209,41 +226,4 @@ def is_serial_number(remaining):
 
         return False, None, message
     else:
-        return True, None, "✅ 流水號格式正確"
-
-# def validate_matching_numbers(data_file: str | Path,
-#                              logger: logging.Logger,
-#                              phase: str) -> dict:
-#     """驗證媒合編號是否符合格式。
-    
-#     Args:
-#         data_file: 資料檔案路徑
-#         phase: 計畫期別
-#     """
-#     try:
-#         df_matching_number = load_data(path=data_file,
-#                                        header_rows=[2, 3],
-#                                        logger=logger)
-#         matching_numbers = df_matching_number.iloc[:,0].dropna().to_list()
-#         errors = []
-#         for idx, number in enumerate(matching_numbers):
-#             error_result = is_valid_matching_number(number, phase)
-#             if error_result:
-#                 errors.append(f"第{idx+1}筆: {number} 不符合格式")
-#         if not errors:
-#             logic_result['sub_status']['matching_number']['status'] = True
-#             logic_result['sub_status']['matching_number']['info'] = len(matching_numbers)
-#             logic_result['sub_status']['matching_number']['message'] = "✅ 媒合編號格式正確"
-#         else:
-#             logic_result['sub_status']['matching_number']['status'] = False
-#             logic_result['sub_status']['matching_number']['info'] = len(errors)
-#             logic_result['sub_status']['matching_number']['message'] = f"❌ 媒合編號格式錯誤: {errors}"
-
-#         return logic_result
-    
-#     except Exception as e:
-#         logger.error(format_func_msg(func='validate_matching_numbers', msg=f"驗證媒合編號時發生錯誤: {e}"))
-#         return None
-
-
-
+        return True, remaining, "✅ 流水號格式正確"
