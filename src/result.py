@@ -14,7 +14,7 @@ logger = setup_logger(name=__name__, file_path=f'{log_path}/{__name__}.log')
 
 class Result:
     def __init__(self,
-                 file_name: str|Path,
+                 file_name: str,
                  result_path: str|Path = result_path):
         self.fname = file_name
         self.result_path = result_path

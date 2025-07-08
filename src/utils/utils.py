@@ -151,7 +151,7 @@ def load_data(path: str | Path,
 
         return None
     
-def load_schema(path: str | Path,
+def load_schema(path,
                 header_rows: list[int] = [2, 3],
                 sheet: int = 0 ) -> list[str]:
     """讀取雙層表頭並攤平成單層欄位。

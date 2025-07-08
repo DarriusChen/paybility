@@ -9,7 +9,7 @@ from utils.utils import MAX_YEAR, MIN_YEAR, PERIOD, COUNTY, MAPPING_FILE, TABLES
 logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')
 
         
-def validate_path(path: str|Path):
+def validate_path(file):
     """驗證路徑格式是否正確，並回傳驗證結果。
     
     Args:
@@ -18,7 +18,8 @@ def validate_path(path: str|Path):
         dict: 驗證結果
     """
     # abspath
-    path = Path(path).resolve()
+
+    path = Path(file.name).resolve()
     
     fileinfo = get_dict_template("file_check")
 
@@ -28,21 +29,8 @@ def validate_path(path: str|Path):
     fileinfo["sub_status"]["name"]["status"] = status
     fileinfo["sub_status"]["name"]["info"] = info # 檔案名稱中的業者編號
     fileinfo["sub_status"]["name"]["message"] = message 
-
-    # suffix check
-    status, info, message = is_valid_suffix(path)
-
-    fileinfo["sub_status"]["suffix"]["status"] = status
-    fileinfo["sub_status"]["suffix"]["info"] = info
-    fileinfo["sub_status"]["suffix"]["message"] = message 
     
-    status, info, message = is_exist_file(path)
-
-    fileinfo["sub_status"]["exist"]["status"] = status
-    fileinfo["sub_status"]["exist"]["info"] = info
-    fileinfo["sub_status"]["exist"]["message"] = message 
-    
-    status, info, message = is_readable_file(path)
+    status, info, message = is_readable_file(file)
 
     fileinfo["sub_status"]["readable"]["status"] = status
     fileinfo["sub_status"]["readable"]["info"] = info # 單個表的dataframe
@@ -57,8 +45,6 @@ def validate_path(path: str|Path):
     
     if (fileinfo["sub_status"]["name"]["status"] and
         fileinfo["sub_status"]["readable"]["status"] and 
-        fileinfo["sub_status"]["exist"]["status"] and
-        fileinfo["sub_status"]["suffix"]["status"] and 
         fileinfo["sub_status"]["company_info"]["status"]):
         
         fileinfo["status"]["status"] = True
@@ -146,14 +132,7 @@ def is_valid_suffix(file: Path):
     else:
         return False, file.suffix, "❌ 副檔名錯誤"
 
-def is_exist_file(file: Path):
-    
-    if file.exists():
-        return True, None, "✅ 檔案存在"
-    else:
-        return False, None, "❌ 檔案不存在"
-    
-def is_readable_file(file: Path):
+def is_readable_file(file):
     head = load_schema(file, header_rows=[1])
     schema = load_schema(file, header_rows=[2, 3])
     df = load_schema(file, header_rows=0)
