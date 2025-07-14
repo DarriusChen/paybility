@@ -58,13 +58,20 @@ def get_dict_template(name: str):
     elif name == "logic_check":
         sub_status = {
             
-            "error_row": [], # 記錄所有error的list id
-            "match_number": [], # 記錄每個row媒合編號的情況 
-            "recipient": [], # 記錄每個row申請人/受款人的情況 
-            "cash_unique": [], # 記錄每個row金額的唯一性 
-            "case_unique": [], # 記錄每個row案件的唯一性(表九)
-            "date": [], # 記錄每個row時間的情況(表九)
-            "fee": [], # 記錄每個row金額的情況 (not yet) 
+            # "error_row": [], # 記錄所有error的list id
+            # "match_number": [], # 記錄每個row媒合編號的情況 
+            # "recipient": [], # 記錄每個row申請人/受款人的情況 
+            # "cash_unique": [], # 記錄每個row金額的唯一性 
+            # "case_unique": [], # 記錄每個row案件的唯一性(表九)
+            # "date": [], # 記錄每個row時間的情況(表九)
+            # "fee": [], # 記錄每個row金額的情況 (not yet) 
+            # "error_row": attribute(), # 記錄所有error的list id
+            "match_numbers": attribute(status=True, info=[]), # 記錄每個row媒合編號的情況 
+            "recipients": attribute(status=True, info=[]), # 記錄每個row申請人/受款人的情況 
+            "cash_uniques": attribute(status=True, info=[]), # 記錄每個row金額的唯一性 
+            "case_uniques": attribute(status=True, info=[]), # 記錄每個row案件的唯一性(表九)
+            "dates": attribute(status=True, info=[]), # 記錄每個row時間的情況(表九)
+            "fees": attribute(status=True, info=[]), # 記錄每個row金額的情況 (not yet) 
         }
         template["sub_status"] = sub_status
     elif name == "matchnumber_check":

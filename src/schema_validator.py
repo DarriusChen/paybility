@@ -96,11 +96,11 @@ def validate_schema(file_type: str,
 
         schema_result['sub_status']['column_name']['status'] = False
         schema_result['sub_status']['column_name']['info'] = f"{file_type}"
-        schema_result['sub_status']['column_name']['message'] = "❌ 欄位名稱及順序錯誤"
+        schema_result['sub_status']['column_name']['message'] = "表頭名稱錯誤"
     else:
         schema_result['sub_status']['column_name']['status'] = True
         schema_result['sub_status']['column_name']['info'] = f"{file_type}"
-        schema_result['sub_status']['column_name']['message'] = "✅ 欄位名稱及順序正確"
+        schema_result['sub_status']['column_name']['message'] = "表頭名稱正確"
 
 
     # 驗證欄位名稱是否符合模板

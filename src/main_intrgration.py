@@ -31,23 +31,57 @@ if "database_service" not in st.session_state:
 
 # Test function
 
+def normalize_format(result: dict, name:str):
+
+    pretty_info(result["status"]["status"], name, 0)
+
+    
+    if result["status"]["status"] == False:
+        for k, v in result["sub_status"].items():
+            # if v["status"]== False:
+            pretty_info(v["status"], k, 1)
+
+    st.session_state.log_lines.append(" ")
+            
+
+def pretty_info(status: bool, message: str, level: int = 0):
+
+    indent = "&nbsp;" * 4 * level
+
+    if level == 0:
+        _ = "‣"
+    else:
+        _ = "→"
+
+    if status:
+        color: str = "green"
+        st.session_state.log_lines.append(f"<span style='color: {color}'>{indent}{_} </span> {message}")
+        # st.session_state.log_lines.append(f"✅ {message}")
+    else:
+        color: str = "red"
+        st.session_state.log_lines.append(f"<span style='color: {color}'>{indent}{_} </span> {message}")
+        # st.session_state.log_lines.append(f"❌ {message}")
+        
+    
+    
 
 # TODO: 改成實際的驗證函數
 def test_validate_file(files, result_path):
+    
     st.session_state.show_result = True
     st.session_state.log_lines.append("=== 驗證開始 ===")
     for i, file in enumerate(files):
+        
         st.session_state.log_lines.append(f"[{i+1}/{len(files)}]上傳檔案: {file.name}")
         # st.session_state.log_lines.append(f"檔案類型: {file.type}")
         # st.session_state.log_lines.append(f"檔案大小: {file.size} bytes")
-        result_obj = Result(file_name=file.name, result_path=result_path)
         
         file_check_result = validate_path(file)
+        
+        normalize_format(file_check_result, "檔名")
+        
         if file_check_result["status"]["status"]:
-            st.session_state.log_lines.append("--- ✅檔名 ---")
-            result_obj.update_result('file_check', file_check_result)
-            
-
+        
             # parameters
             data_frame = file_check_result["sub_status"]["readable"]["info"]
             file_type = file_check_result["sub_status"]["name"]["info"]["A"]
@@ -57,15 +91,13 @@ def test_validate_file(files, result_path):
             period = file_check_result["sub_status"]["name"]["info"]["C"]
 
             # ------------------------------
+            
             schema_result = validate_schema(data_file=data_frame,
                                     file_type=file_type,           
                                     company_code=company_code)
-            result_obj.update_result('schema_check', schema_result)
-
-            if schema_result["status"]["status"]:
-                st.session_state.log_lines.append("--- ✅表頭 ---")
-            else:
-                st.session_state.log_lines.append("--- ❌表頭 ---")
+            
+            
+            normalize_format(schema_result, "表頭")      
 
             # ------------------------------
             logic_result = validate_logic( data_frame,
@@ -73,25 +105,9 @@ def test_validate_file(files, result_path):
                                     phase=period,
                                     county=county,
                                     county_code=county_code)
-            result_obj.update_result('logic_check', logic_result)
             
-            if schema_result["status"]["status"]:
-                st.session_state.log_lines.append("--- ✅業務邏輯 ---")
-            else:
-                st.session_state.log_lines.append("--- ❌業務邏輯 ---")
-
-        else:
-            st.session_state.log_lines.append("--- ❌檔名 ---")
-            # st.session_state.log_lines.append(f"{file_check_result['sub_status']}")
+            normalize_format(logic_result, "表單內容")
             
-
-        result_obj.save_result()
-
-    
-        
-        
-
-
 
     st.session_state.log_lines.append("=== 驗證完成 ===")
 
@@ -136,7 +152,8 @@ def streamlit_app(result_path: str = RESULT_PATH):
     #             st.dataframe(df)
     #         # for 測試用，只顯示最後 100 行，避免資料量過大
             for line in st.session_state.log_lines[-100:]:
-                st.write(line)
+                # st.write(line)
+                st.markdown(line, unsafe_allow_html=True)
     
 
 # ------------------------------------------------------------#

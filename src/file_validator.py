@@ -18,8 +18,10 @@ def validate_path(file):
         dict: 驗證結果
     """
     # abspath
-
-    path = Path(file.name).resolve()
+    if isinstance(file, str):
+        path = Path(file).resolve()
+    else:
+        path = Path(file.name).resolve()
     
     fileinfo = get_dict_template("file_check")
 
@@ -36,12 +38,13 @@ def validate_path(file):
     fileinfo["sub_status"]["readable"]["info"] = info # 單個表的dataframe
     fileinfo["sub_status"]["readable"]["message"] = message 
 
-    company_code = fileinfo["sub_status"]["name"]["info"]['B']
-    status, info, message = is_valid_company(company_code)
+    if fileinfo["sub_status"]["name"]["info"].get('B') != None:
+        company_code = fileinfo["sub_status"]["name"]["info"]['B']
+        status, info, message = is_valid_company(company_code)
  
-    fileinfo["sub_status"]["company_info"]["status"] = status
-    fileinfo["sub_status"]["company_info"]["info"] = info # 資料中的 '縣市' '縣市代碼' '業者名稱' '系統業者代號'
-    fileinfo["sub_status"]["company_info"]["message"] = message 
+        fileinfo["sub_status"]["company_info"]["status"] = status
+        fileinfo["sub_status"]["company_info"]["info"] = info # 資料中的 '縣市' '縣市代碼' '業者名稱' '系統業者代號'
+        fileinfo["sub_status"]["company_info"]["message"] = message 
     
     if (fileinfo["sub_status"]["name"]["status"] and
         fileinfo["sub_status"]["readable"]["status"] and 
@@ -49,11 +52,11 @@ def validate_path(file):
         
         fileinfo["status"]["status"] = True
         fileinfo["status"]["info"] = None
-        fileinfo["status"]["message"] = "✅ 檔案格式正確"
+        fileinfo["status"]["message"] = "檔名格式正確"
     else:
         fileinfo["status"]["status"] = False
         fileinfo["status"]["info"] = None
-        fileinfo["status"]["message"] = "❌ 檔案格式錯誤"
+        fileinfo["status"]["message"] = "檔名格式錯誤"
     
     return fileinfo
         
