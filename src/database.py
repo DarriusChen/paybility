@@ -22,9 +22,12 @@ class DatabaseService:
 
     def get_pyodbc_connection(self):
         """取得 pyodbc 連接 """
-        return pyodbc.connect(self.connection_string)
+        try:
+            return pyodbc.connect(self.connection_string)
+        except Exception as e:
+            raise Exception(f"function `get_pyodbc_connection` 資料庫連線失敗: {str(e)}")
     
-    def get_data(self, table_name: str, column_name: str = None, value: str = None) -> List[Dict]:
+    def get_data(self, table_name: str, column_name: str = None, value: str = None, limit: int = 100, unique_value: bool = False) -> List[Dict]:
         """使用 pyodbc 取得資料"""
         conn = self.get_pyodbc_connection()
         try:
@@ -32,14 +35,39 @@ class DatabaseService:
             if column_name and value:
                 cursor.execute(f"SELECT * FROM {table_name} WHERE {column_name} = ?", value)
             elif column_name:
-                cursor.execute(f"SELECT * FROM {table_name} WHERE {column_name}")
+                if unique_value == True:
+                    cursor.execute(f"SELECT DISTINCT {column_name} FROM {table_name}")
+                else:
+                    cursor.execute(f"SELECT TOP {limit} {column_name} FROM {table_name}")
             else:
-                cursor.execute(f"SELECT * FROM {table_name}")
+                if unique_value == True:
+                    cursor.execute(f"SELECT DISTINCT TOP {limit} * FROM {table_name}")
+                else:
+                    cursor.execute(f"SELECT TOP {limit} * FROM {table_name}")
             columns = [column[0] for column in cursor.description]
             results = []
             for row in cursor.fetchall():
                 results.append(dict(zip(columns, row)))
             return results, len(results)
+        except Exception as e:
+            raise Exception(f"function `get_data` 資料庫查詢失敗: {str(e)}")
+        finally:
+            conn.close()
+
+    def get_data_count(self, table_name: str, column_name: str = None, value: str = None) -> int:
+        """使用 pyodbc 取得資料筆數"""
+        conn = self.get_pyodbc_connection()
+        try:
+            cursor = conn.cursor()
+            if column_name and value:
+                cursor.execute(f"SELECT COUNT(*) FROM {table_name} WHERE {column_name} = ?", value)
+            elif column_name:
+                cursor.execute(f"SELECT COUNT({column_name}) FROM {table_name}")
+            else:
+                cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+            return cursor.fetchone()[0]
+        except Exception as e:
+            raise Exception(f"function `get_data_count` 資料庫查詢失敗: {str(e)}")
         finally:
             conn.close()
 
@@ -54,5 +82,7 @@ class DatabaseService:
             for row in cursor.fetchall():
                 results.append(dict(zip(columns, row)))
             return results
+        except Exception as e:
+            raise Exception(f"function `get_data_by_match_id` 資料庫查詢失敗: {str(e)}")
         finally:
             conn.close()
