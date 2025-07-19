@@ -1,0 +1,250 @@
+[
+    {
+        "file_name": "20250718_123456.xlsx",
+        "validate_result": {
+            "is_valid": true,
+            "message": "✔"
+        },
+        "error_details": []
+    },
+    {
+        "file_name": "20250718_123457.xlsx",
+        "validate_result": {
+            "is_valid": false,
+            "message": "✖"
+        },
+        "error_details": [
+            {
+                "受款人／申請人資料驗證": [
+                    {
+                        "status": {
+                            "status": false,
+                            "info": null,
+                            "message": "❌ 受款人/申請人格式錯誤"
+                        },
+                        "sub_status": [
+                            {
+                                "status": true,
+                                "info": "陳薇媗",
+                                "message": "✅ 名字有效"
+                            },
+                            {
+                                "status": false,
+                                "info": "S693438049",
+                                "message": "❌ 身分證錯誤"
+                            },
+                            {
+                                "status": true,
+                                "info": "006",
+                                "message": "✅ 銀行代碼正確"
+                            },
+                            {
+                                "status": true,
+                                "info": "3074",
+                                "message": "✅ 分行代碼正確"
+                            },
+                            {
+                                "status": true,
+                                "info": "000003294141069076",
+                                "message": "✅ 帳號正確"
+                            }
+                        ]
+                    },
+                    {
+                        "status": {
+                            "status": false,
+                            "info": null,
+                            "message": "❌ 受款人/申請人格式錯誤"
+                        },
+                        "sub_status": [
+                            {
+                                "status": true,
+                                "info": "蕭務",
+                                "message": "✅ 名字有效"
+                            },
+                            {
+                                "status": false,
+                                "info": "Y573209002",
+                                "message": "❌ 身分證錯誤"
+                            },
+                            {
+                                "status": true,
+                                "info": "012",
+                                "message": "✅ 銀行代碼正確"
+                            },
+                            {
+                                "status": true,
+                                "info": "4302",
+                                "message": "✅ 分行代碼正確"
+                            },
+                            {
+                                "status": true,
+                                "info": "000066710077853770",
+                                "message": "✅ 帳號正確"
+                            }
+                        ]
+                    },
+                    {
+                        "status": {
+                            "status": false,
+                            "info": null,
+                            "message": "❌ 受款人/申請人格式錯誤"
+                        },
+                        "sub_status": [
+                            {
+                                "status": true,
+                                "info": "呂氏建設\n股份有限公司",
+                                "message": "✅ 名字有效"
+                            },
+                            {
+                                "status": false,
+                                "info": "P6534607",
+                                "message": "❌ 身分證錯誤"
+                            },
+                            {
+                                "status": true,
+                                "info": "812",
+                                "message": "✅ 銀行代碼正確"
+                            },
+                            {
+                                "status": false,
+                                "info": null,
+                                "message": "❌ 分行代碼錯誤"
+                            },
+                            {
+                                "status": true,
+                                "info": "000074877840941073",
+                                "message": "✅ 帳號正確"
+                            }
+                        ]
+                    }
+                ]
+            }
+            
+        ]   
+    },
+    {
+        "file_name": "20250718_123458.xlsx",
+        "validate_result": {
+            "is_valid": true,
+            "message": "✔"
+        },
+        "error_details": []
+    },
+    {
+        "file_name": "20250718_123459.xlsx",
+        "validate_result": {
+            "is_valid": false,
+            "message": "✖"
+        },
+        "error_details": [
+            {
+                "受款人／申請人資料驗證": [
+                    {
+                        "status": {
+                            "status": false,
+                            "info": null,
+                            "message": "❌ 受款人/申請人格式錯誤"
+                        },
+                        "sub_status": [
+                            {
+                                "status": true,
+                                "info": "陳薇媗",
+                                "message": "✅ 名字有效"
+                            },
+                            {
+                                "status": false,
+                                "info": "S693438049",
+                                "message": "❌ 身分證錯誤"
+                            },
+                            {
+                                "status": true,
+                                "info": "006",
+                                "message": "✅ 銀行代碼正確"
+                            },
+                            {
+                                "status": true,
+                                "info": "3074",
+                                "message": "✅ 分行代碼正確"
+                            },
+                            {
+                                "status": true,
+                                "info": "000003294141069076",
+                                "message": "✅ 帳號正確"
+                            }
+                        ]
+                    },
+                    {
+                        "status": {
+                            "status": false,
+                            "info": null,
+                            "message": "❌ 受款人/申請人格式錯誤"
+                        },
+                        "sub_status": [
+                            {
+                                "status": true,
+                                "info": "蕭務",
+                                "message": "✅ 名字有效"
+                            },
+                            {
+                                "status": false,
+                                "info": "Y573209002",
+                                "message": "❌ 身分證錯誤"
+                            },
+                            {
+                                "status": true,
+                                "info": "012",
+                                "message": "✅ 銀行代碼正確"
+                            },
+                            {
+                                "status": true,
+                                "info": "4302",
+                                "message": "✅ 分行代碼正確"
+                            },
+                            {
+                                "status": true,
+                                "info": "000066710077853770",
+                                "message": "✅ 帳號正確"
+                            }
+                        ]
+                    },
+                    {
+                        "status": {
+                            "status": false,
+                            "info": null,
+                            "message": "❌ 受款人/申請人格式錯誤"
+                        },
+                        "sub_status": [
+                            {
+                                "status": true,
+                                "info": "呂氏建設\n股份有限公司",
+                                "message": "✅ 名字有效"
+                            },
+                            {
+                                "status": false,
+                                "info": "P6534607",
+                                "message": "❌ 身分證錯誤"
+                            },
+                            {
+                                "status": true,
+                                "info": "812",
+                                "message": "✅ 銀行代碼正確"
+                            },
+                            {
+                                "status": false,
+                                "info": null,
+                                "message": "❌ 分行代碼錯誤"
+                            },
+                            {
+                                "status": true,
+                                "info": "000074877840941073",
+                                "message": "✅ 帳號正確"
+                            }
+                        ]
+                    }
+                ]
+            }
+            
+        ]   
+    }
+]
