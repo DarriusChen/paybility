@@ -37,12 +37,12 @@ def main(args):
     # print(file_check_result["sub_status"]["company_info"]["info"]["縣市"])
     # Step 2: schema check
     # Todo 換成UI上選擇的結果
-    data_frame = file_check_result["sub_status"]["readable"]["info"]
-    file_type = file_check_result["sub_status"]["name"]["info"]["A"]
-    
-    county = file_check_result["sub_status"]["company_info"]["info"]["縣市"]
-    county_code = file_check_result["sub_status"]["company_info"]["info"]["縣市代碼"]
-    company_code = file_check_result["sub_status"]["company_info"]["info"]["系統業者代號"]
+
+    data_frame = file_check_result["sub_status"]["讀取"]["info"]
+    file_type = file_check_result["sub_status"]["檔案名稱"]["info"]["A"]
+    county_code = file_check_result["sub_status"]["業者代碼"]["info"]["縣市代碼"]
+    company_code = file_check_result["sub_status"]["業者代碼"]["info"]["系統業者代號"]
+    period = file_check_result["sub_status"]["檔案名稱"]["info"]["C"]
 
     schema_result = validate_schema(data_file=data_frame,
                                     file_type=file_type,           
@@ -56,11 +56,10 @@ def main(args):
 
     # ------------------------------------------------------------ #
     # Step 3: logic check -1: 媒合編號
-    period = file_check_result["sub_status"]["name"]["info"]["C"]
-    logic_result = validate_logic( data_frame,
+
+    logic_result = validate_logic(  data_frame,
                                     file_type=file_type,
                                     phase=period,
-                                    county=county,
                                     county_code=county_code)
     if result_obj.update_result('logic_check', logic_result):
         logger.info(format_func_msg(func='main', msg="媒合編號 檢查結果更新成功"))

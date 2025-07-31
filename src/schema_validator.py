@@ -69,13 +69,13 @@ def validate_schema(file_type: str,
     else:
         schema_result['status']['status'] = False
         schema_result['status']['info'] = None
-        schema_result['status']['message'] = "❌ 表單錯誤"
+        schema_result['status']['message'] = " 表單錯誤"
       
     if not isinstance(template_columns, list):
         logger.error(
             format_func_msg(func='validate_data', msg=f"讀取 schema 時發生錯誤: {template_columns}"))
         schema_result['status']['info'] = str(template_columns)
-        schema_result['status']['message'] = "❌ 讀取Template結構失敗"
+        schema_result['status']['message'] = " 讀取Template結構失敗"
 
         return schema_result
 
@@ -94,13 +94,13 @@ def validate_schema(file_type: str,
         logger.error(format_func_msg(func='validate_data', msg=error_msg))
         error_messages.append(error_msg)
 
-        schema_result['sub_status']['column_name']['status'] = False
-        schema_result['sub_status']['column_name']['info'] = f"{file_type}"
-        schema_result['sub_status']['column_name']['message'] = "表頭名稱錯誤"
+        schema_result['sub_status']['表格名稱']['status'] = False
+        schema_result['sub_status']['表格名稱']['info'] = f"{file_type}"
+        schema_result['sub_status']['表格名稱']['message'] = "錯誤"
     else:
-        schema_result['sub_status']['column_name']['status'] = True
-        schema_result['sub_status']['column_name']['info'] = f"{file_type}"
-        schema_result['sub_status']['column_name']['message'] = "表頭名稱正確"
+        schema_result['sub_status']['表格名稱']['status'] = True
+        schema_result['sub_status']['表格名稱']['info'] = f"{file_type}"
+        schema_result['sub_status']['表格名稱']['message'] = "正確"
 
 
     # 驗證欄位名稱是否符合模板
@@ -135,42 +135,42 @@ def validate_schema(file_type: str,
         logger.error(format_func_msg(func='validate_data', msg=error_msg))
         error_messages.append(error_msg)
 
-        schema_result['sub_status']['column_name']['status'] = False
-        schema_result['sub_status']['column_name']['info'] = len(error_columns)
-        schema_result['sub_status']['column_name']['message'] = "❌ 欄位名稱錯誤"
+        schema_result['sub_status']['表格名稱']['status'] = False
+        schema_result['sub_status']['表格名稱']['info'] = len(error_columns)
+        schema_result['sub_status']['表格名稱']['message'] = "錯誤"
         validation_passed = False
     else:
-        schema_result['sub_status']['column_name']['status'] = True
-        schema_result['sub_status']['column_name']['info'] = len(error_columns)
-        schema_result['sub_status']['column_name']['message'] = "✅ 欄位名稱正確"
+        schema_result['sub_status']['表格名稱']['status'] = True
+        schema_result['sub_status']['表格名稱']['info'] = len(error_columns)
+        schema_result['sub_status']['表格名稱']['message'] = "正確"
     
     entity_info = data_file[0]
     if "業者" in entity_info[0]:
         entity_code = entity_info[2]
         # print(entity_code, company_code)
         if entity_code == company_code:
-            schema_result['sub_status']['entity_code']['status'] = True
-            schema_result['sub_status']['entity_code']['info'] = entity_code
-            schema_result['sub_status']['entity_code']['message'] = "✅ 業者代碼正確"
+            schema_result['sub_status']['業者代碼']['status'] = True
+            schema_result['sub_status']['業者代碼']['info'] = entity_code
+            schema_result['sub_status']['業者代碼']['message'] = "正確"
         else:
-            schema_result['sub_status']['entity_code']['status'] = False
-            schema_result['sub_status']['entity_code']['info'] = f"錯誤業者代碼({company_code}): {entity_code}"
-            schema_result['sub_status']['entity_code']['message'] = "❌ 業者代碼錯誤，請確認業者代碼是否正確"
+            schema_result['sub_status']['業者代碼']['status'] = False
+            schema_result['sub_status']['業者代碼']['info'] = f"{company_code} {entity_code}"
+            schema_result['sub_status']['業者代碼']['message'] = "錯誤，請確認業者代碼是否正確"
 
 
     else:
-        schema_result['sub_status']['entity_code']['status'] = False
-        schema_result['sub_status']['entity_code']['info'] = entity_info[0]
-        schema_result['sub_status']['entity_code']['message'] = f"❌ 業者代碼欄位名稱錯誤: {entity_info[0]} - {entity_info[2]}"
+        schema_result['sub_status']['業者代碼']['status'] = False
+        schema_result['sub_status']['業者代碼']['info'] = entity_info[0]
+        schema_result['sub_status']['業者代碼']['message'] = f"錯誤: {entity_info[0]} - {entity_info[2]}"
 
     
 
     # 返回結果結構
-    if (schema_result['sub_status']['entity_code']['status'] and 
-        schema_result['sub_status']['column_name']['status']):
+    if (schema_result['sub_status']['業者代碼']['status'] and 
+        schema_result['sub_status']['表格名稱']['status']):
         schema_result['status']['status'] = True
         schema_result['status']['info'] = None
-        schema_result['status']['message'] = "✅ 欄位結構正確"
+        schema_result['status']['message'] = "欄位結構正確"
 
         logger.info(
         format_func_msg(func='validate_data',
@@ -178,7 +178,7 @@ def validate_schema(file_type: str,
     else:
         schema_result['status']['status'] = False
         schema_result['status']['info'] = f"錯誤訊息: {'; '.join(error_messages)}"
-        schema_result['status']['message'] = "❌ 欄位結構錯誤"
+        schema_result['status']['message'] = " 欄位結構錯誤"
 
         logger.info(
         format_func_msg(func='validate_data',

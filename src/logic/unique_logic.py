@@ -1,6 +1,6 @@
 from utils.utils import is_int, get_dict_template
 import numpy as np
-def valid_uniqueinfo(items: list[str], names: list[str]):
+def valid_uniqueinfo(items: dict):
     """檢查受款人資訊是否正確
     
     Args:
@@ -11,32 +11,19 @@ def valid_uniqueinfo(items: list[str], names: list[str]):
     """
     result = get_dict_template("unique_check")
 
-    status, info, message = is_unique(items, names)
-    result['sub_status']['unique']['status'] = status
-    result['sub_status']['unique']['info'] = info
-    result['sub_status']['unique']['message'] = message
-
-    if result['sub_status']['unique']['status']:
-        result["status"]["status"] = True
-        result["status"]["info"] = None
-        result["status"]["message"] = f"✅ {result['sub_status']['unique']['info']}格式正確"
-    else:
-        result["status"]["status"] = False
-        result["status"]["info"] = None
-        result["status"]["message"] = f"❌ {result['sub_status']['unique']['info']}格式錯誤"
+    status, info, message = is_unique(items)
+    result["status"]["status"] = status
+    result["status"]["info"] = info
+    result["status"]["message"] = message
     return result
 
-def is_unique(items: list, names:list):
-    
-    if set(items) == {1}:
-    # casetype
-        if max(items) > 1:
-            return False, "案件", "❌ 案件不唯一"
-        else:
-            return True, "案件", "✅ 案件唯一"
-    else: 
-    # cashtype
-        if len([x for x in items if x not in [0, np.nan]]) > 1:
-            return False, "費用", "❌ 費用不唯一"
-        else:
-            return True, "費用", "✅ 費用唯一"
+def is_unique(items:dict):
+    unique_list = []
+    for k, v in items.items():
+        if v != '':
+            unique_list.append(k)
+
+    if len(unique_list) != 1:
+        return False, unique_list, f"多筆金額在同一行 {unique_list}"
+    else:
+        return True, unique_list[0], unique_list[0]

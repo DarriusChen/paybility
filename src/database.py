@@ -86,3 +86,9 @@ class DatabaseService:
             raise Exception(f"function `get_data_by_match_id` 資料庫查詢失敗: {str(e)}")
         finally:
             conn.close()
+
+if __name__ == "__main__":
+    db = DatabaseService()
+
+    result = db.get_data_by_match_id("寄居蟹南E2M14100023", "ContractHouse_PayTable_0205_sheet_9_plan41")
+    print(result)

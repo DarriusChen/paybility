@@ -1,15 +1,13 @@
 import re
-
-
 from utils.utils import is_int, get_dict_template
 # 申請人/受款人檢查邏輯
 
 
-def valid_recipientinfo(items:list):
+def valid_recipientinfo(items:dict):
     """檢查受款人資訊是否正確
     
     Args:
-        items: list[name, id_name, id_bank, id_branch, account]
+        items: dict
         result: dict{}
     Returns:
         result: dict{}
@@ -17,7 +15,7 @@ def valid_recipientinfo(items:list):
     """
     result = get_dict_template("recipient_check")
 
-    name, id_name, id_bank, id_branch, account = items
+    name, id_name, id_bank, id_branch, account = items.values()
     # print(name, id_name, id_bank, id_branch, account)
     status, info, message = is_name_valid(name)
     result['sub_status']['name']['status'] = status
@@ -53,20 +51,20 @@ def valid_recipientinfo(items:list):
 
         result["status"]["status"] = True
         result["status"]["info"] = None
-        result["status"]["message"] = "✅ 受款人/申請人格式正確"
+        result["status"]["message"] = "格式正確"
     else:
         result["status"]["status"] = False
         result["status"]["info"] = None
-        result["status"]["message"] = "❌ 受款人/申請人格式錯誤"
+        result["status"]["message"] = "格式錯誤"
 
     return result
 
 # name check 
 def is_name_valid(name):
     if isinstance(name, str):   
-        return True, name, "✅ 名字有效"
+        return True, name, "名字有效"
     else:
-        return False, str(name), "❌ 名字無效"
+        return False, str(name), "名字無效"
 
 # ID Code check
 letter_code_map = {
@@ -127,17 +125,17 @@ def check_ID(id = "A123456789"):
                 total += int(c) * int(w)
             
             if total % 10 == 0:
-                # print("✅")
-                return True, str(id), "✅ 身分證正確"
+                
+                return True, str(id), "身分證正確"
             else:
-                # print("❌")
-                return False, str(id), "❌ 身分證錯誤"
+                
+                return False, str(id), "身分證錯誤"
         else:
-            # print("❌")
-            return False, str(id), "❌ 身分證錯誤"
+            
+            return False, str(id), "身分證錯誤"
     else:
-        # print("❌")
-        return False, str(id), "❌ 身分證錯誤"
+        
+        return False, str(id), "身分證錯誤"
 
 def is_bank_vaild(code: str):
     if is_int(code) and len(code) <= 3:
@@ -145,23 +143,23 @@ def is_bank_vaild(code: str):
             code = "0" + code
         elif len(code) == 1:
             code = "00" + code
-        return True, code, "✅ 銀行代碼正確"
+        return True, code, "銀行代碼正確"
     else:
-        return False, None, "❌ 銀行代碼錯誤"
+        return False, None, "銀行代碼錯誤"
     
 def is_branch_vaild(code: str):
     if is_int(code) and len(code) == 4:
-        return True, code, "✅ 分行代碼正確"
+        return True, code, "分行代碼正確"
     else:
-        return False, None, "❌ 分行代碼錯誤"
+        return False, None, "分行代碼錯誤"
 
 def is_account_vaild(code: str):
     if is_int(code) and len(code) <= 18:
         # padding to length 18
         code = "0" * (18 - len(code)) + code
-        return True, code, "✅ 帳號正確"
+        return True, code, "帳號正確"
     else:
-        return False, None, "❌ 帳號格式錯誤"
+        return False, None, "帳號格式錯誤"
     
 
     

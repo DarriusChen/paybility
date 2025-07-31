@@ -13,10 +13,8 @@ from logic_validator import validate_logic
 
 # 用 session_state 儲存日誌，避免每次重新執行就消失
 if "log_lines" not in st.session_state:
-    st.session_state.log_lines = []
+    st.session_state.log_lines = {}
 
-# if "attribute" not in st.session_state:
-#     st.session_state.log_lines = {}
 
 if 'show_result' not in st.session_state:
     st.session_state.show_result = False
@@ -27,68 +25,79 @@ if "file_uploader" not in st.session_state:
 if "database_service" not in st.session_state:
     st.session_state.database_service = DatabaseService()
 
-
-
 # Test function
+def normalize_format(name:str, result: dict, checktype:str):
+    def pretty_append(d = None):
+        if d == None:
+            _ = "---"
+            msg = ""
+        elif d["status"] == True:
+            _ = "✔"
+            msg = d['message']
+        else:
+            _ = "✖"  
+            msg = d['message']
+        st.session_state.log_lines[name][checktype][k].append(f"{_} : {msg}")
 
-def normalize_format(result: dict, name:str):
+    if st.session_state.log_lines[name].get(checktype) == None:
+        st.session_state.log_lines[name][checktype] = {}
 
-    pretty_info(result["status"]["status"], name, 0)
+    for k, v in result["sub_status"].items():
+        if st.session_state.log_lines[name][checktype].get(k) == None:
+            st.session_state.log_lines[name][checktype][k] = []
 
-    
-    if result["status"]["status"] == False:
-        for k, v in result["sub_status"].items():
-            # if v["status"]== False:
-            pretty_info(v["status"], k, 1)
+        if checktype == "表單內容":
+            
+            for rowinfo in v["info"]:
 
-    st.session_state.log_lines.append(" ")
+                pretty_append(rowinfo['status'])
             
 
-def pretty_info(status: bool, message: str, level: int = 0):
+        else:
+            pretty_append(v)
 
-    indent = "&nbsp;" * 4 * level
-
-    if level == 0:
-        _ = "‣"
-    else:
-        _ = "→"
-
-    if status:
-        color: str = "green"
-        st.session_state.log_lines.append(f"<span style='color: {color}'>{indent}{_} </span> {message}")
-        # st.session_state.log_lines.append(f"✅ {message}")
-    else:
-        color: str = "red"
-        st.session_state.log_lines.append(f"<span style='color: {color}'>{indent}{_} </span> {message}")
-        # st.session_state.log_lines.append(f"❌ {message}")
+    # append length 這個暫時的寫法會影響金額邏輯加入後的結果
+    maxl = 0
+    tmp = []
+    
+    if checktype == "表單內容":
         
-    
-    
+        for k, v in st.session_state.log_lines[name][checktype].items():
+            # print(k, len(v))
+            
+            if len(v) > maxl:
+                maxl = len(v)
+            if len(v) == 0:
+                tmp.append(k)
 
+        for tmp_k in tmp:
+            st.session_state.log_lines[name][checktype][tmp_k] = ["---"] * maxl
+
+
+    
 # TODO: 改成實際的驗證函數
 def test_validate_file(files, result_path):
     
     st.session_state.show_result = True
-    st.session_state.log_lines.append("=== 驗證開始 ===")
+    
     for i, file in enumerate(files):
-        
-        st.session_state.log_lines.append(f"[{i+1}/{len(files)}]上傳檔案: {file.name}")
+        # print(i, file)
+        st.session_state.log_lines[file.name] = {}
         # st.session_state.log_lines.append(f"檔案類型: {file.type}")
         # st.session_state.log_lines.append(f"檔案大小: {file.size} bytes")
         
         file_check_result = validate_path(file)
         
-        normalize_format(file_check_result, "檔名")
+        normalize_format(file.name, file_check_result, "檔案名稱")
         
         if file_check_result["status"]["status"]:
         
             # parameters
-            data_frame = file_check_result["sub_status"]["readable"]["info"]
-            file_type = file_check_result["sub_status"]["name"]["info"]["A"]
-            county = file_check_result["sub_status"]["company_info"]["info"]["縣市"]
-            county_code = file_check_result["sub_status"]["company_info"]["info"]["縣市代碼"]
-            company_code = file_check_result["sub_status"]["company_info"]["info"]["系統業者代號"]
-            period = file_check_result["sub_status"]["name"]["info"]["C"]
+            data_frame = file_check_result["sub_status"]["讀取"]["info"]
+            file_type = file_check_result["sub_status"]["檔案名稱"]["info"]["表種"]
+            county_code = file_check_result["sub_status"]["業者代碼"]["info"]["縣市代碼"]
+            company_code = file_check_result["sub_status"]["業者代碼"]["info"]["系統業者代號"]
+            period = file_check_result["sub_status"]["檔案名稱"]["info"]["期別"]
 
             # ------------------------------
             
@@ -97,25 +106,24 @@ def test_validate_file(files, result_path):
                                     company_code=company_code)
             
             
-            normalize_format(schema_result, "表頭")      
+            normalize_format(file.name, schema_result, "表頭")      
 
             # ------------------------------
             logic_result = validate_logic( data_frame,
                                     file_type=file_type,
                                     phase=period,
-                                    county=county,
                                     county_code=county_code)
             
-            normalize_format(logic_result, "表單內容")
-            
+            normalize_format(file.name, logic_result, "表單內容")
 
-    st.session_state.log_lines.append("=== 驗證完成 ===")
+
+    # st.session_state.log_lines.append("=== 驗證完成 ===")
 
 def close_result():
     st.session_state.show_result = False
 
 def restart_app():
-    st.session_state.log_lines = []
+    st.session_state.log_lines = {}
     st.session_state.show_result = False
 
     # 清掉 uploader 的內容
@@ -143,17 +151,20 @@ def streamlit_app(result_path: str = RESULT_PATH):
         st.warning("請上傳檔案")
     
     if st.session_state.show_result:
-        st.button("關閉結果", on_click=close_result, key="close_result_button", icon="❌")
-        with st.container(height=900, border=True):
-            # with open(result_path, "r") as f:
-                # result = json.load(f)
-                # st.write(result)
-    #             df = pd.json_normalize(result)
-    #             st.dataframe(df)
-    #         # for 測試用，只顯示最後 100 行，避免資料量過大
-            for line in st.session_state.log_lines[-100:]:
-                # st.write(line)
-                st.markdown(line, unsafe_allow_html=True)
+        st.button("關閉結果", on_click=close_result, key="close_result_button", icon="✖")
+        for file_name, checks in st.session_state.log_lines.items():
+            
+            with st.expander(file_name):
+                for check_level, check_dict in checks.items():
+                    # if checks != {}:
+                    with st.expander(check_level):
+                        # for k, v in check_dict.items():
+                            # print(k, len(v))
+                        df = pd.DataFrame(check_dict)
+                        st.dataframe(df)
+                    # else:
+                    #     st.write(file_name)
+
     
 
 # ------------------------------------------------------------#
@@ -197,11 +208,73 @@ def search_database():
 
 # ------------------------------------------------------------#
 
+# MYSQL Test
+
+from logic.cash_logic import *
+def test1():
+
+    st.title("費用邏輯測試")
+    st.write("---")
+
+    st.subheader("步驟1: 單筆媒合編號及加總\n")
+    left, right = st.columns(2)
+    with left:
+        st.selectbox("表種", ["表4", "表7", "表9"], key="table_type")
+    with right:
+        st.text_input(label="媒合編號", placeholder="請輸入要搜尋的媒合編號", key="search_query")
+    
+    if st.button("搜尋"):
+        st.write(f"搜尋結果: {st.session_state.search_query}")
+        st.session_state.cashdb = CashDatabase(st.session_state.table_type, st.session_state.search_query)
+        st.dataframe(st.session_state.cashdb.results)
+        
+    
+    st.subheader("步驟2: 各項金額匯總\n")
+
+    if st.button("費用輸出"):
+        st.dataframe(st.session_state.cashdb.sqlname_map)
+
+        for k, v in st.session_state.cashdb.sqlname_map.items():
+            st.write(f"過往{k}: {st.session_state.cashdb.get_history_cash(k)}")
+
+
+    st.subheader("步驟3: 金額邏輯測試\n")
+
+    if st.button("測試"):
+        fake_fee = [1000, 1000, 5000, 10000, 50000]
+        for k, v in st.session_state.cashdb.sqlname_map.items():
+            
+            with st.expander(k):
+                historycash = st.session_state.cashdb.get_history_cash(k)
+                for fake in fake_fee:
+                    test_result = test_valid_cash(number=st.session_state.search_query,
+                                                cash_type=k,
+                                                cash=fake,
+                                                history_cash=historycash)
+                    st.write(f"  申請費(假){fake}$  {test_result}")
+
+
+
+
+
+
+def test2():
+    st.title("表479相關測試")
+    st.write("---")
+    
+def test3():
+    st.title("表479相關測試")
+    st.write("---")
+    pass
+
 if __name__ == "__main__":
     page_names_to_funcs = {
         "Home": streamlit_app,
         "Search": search_page,
         "Search Database": search_database,
+        "Test1": test1,
+        # "Test2": test2,
+        # "Test3": test3 
     }
     page_name = st.sidebar.selectbox("選擇頁面", page_names_to_funcs.keys())
     page_names_to_funcs[page_name]()

@@ -24,8 +24,76 @@ MAPPING_FILE = config['output_path']['mapping_file']
 
 # print(MAX_YEAR, MIN_TEAR, PERIOD, COUNTY, TABLES)
 
+# norm_row_content
+def norm_rowcontent(file_type: str, row: list):
+    if file_type == "表4":
+        _, number, insurance_apply, insurance_cash, notarization_apply, notarization_cash, repair_apply, repair_cash, name, id, id_bank, id_branch, account = row[:13]
+
+        cash_dict =  {
+            "保險費": insurance_cash,
+            "公證費": notarization_cash,
+            "修繕費": repair_cash
+        }
+        recipient_dict = { 
+            "姓名": name,
+            "身分證": id, 
+            "銀行代碼": str(int(id_bank)), 
+            "分行代碼": str(int(id_branch)),
+            "帳號": str(int(account))
+        }
+
+        return str(number), recipient_dict, cash_dict
+        
+    elif file_type == "表7":
+        _, number, notarization_apply, notarization_cash, rental_cash, rental_period, rental_totalperiod, rental_type, name, id, id_bank, id_branch, account = row[:13]
+
+        cash_dict =  {
+            "公證費": notarization_cash,
+            "租金補助": [rental_cash, rental_period, rental_totalperiod]
+        }
+
+        recipient_dict = { 
+            "姓名": name,
+            "身分證": id, 
+            "銀行代碼": str(int(id_bank)), 
+            "分行代碼": str(int(id_branch)),
+            "帳號": str(int(account))
+        }
+
+        return str(number), recipient_dict, cash_dict
+        
+    elif file_type == "表9":
+        _, number, case_1, case_2, case_3, case_4, case_5, case_6, date_start, date_end, notarization_cash, development_cash, management_cash, management_period, management_totalperiod, matching_cash, custody_cash, custody_period, custody_totalperiod = row[:19]
+    
+        cash_dict =  {
+            "公證費": notarization_cash,
+            "開發費": development_cash, 
+            "包管費": [management_cash, management_period, management_totalperiod], 
+            "媒合費": matching_cash, 
+            "代管費": [custody_cash, custody_period, custody_totalperiod]
+        }
+
+        case_dict = {   
+            "新件": case_1,
+            "長者換居": case_2,
+            "既存": case_3,
+            "舊案": case_4,
+            "續約": case_5,
+            "換業者": case_6
+        }
+
+        date_dict = {
+            "租起日": date_start,
+            "租訖日": date_end
+        }
+
+        return str(number), case_dict, cash_dict, date_dict
+
+    else:
+        raise Exception(f"表種錯誤: {file_type}")
+
 #  result template
-def attribute(status=False, info=None, message=""):
+def attribute(status=False, info=None, message="未檢查"):
     return {"status": status, "info": info, "message": message}
 
 def get_dict_template(name: str):
@@ -42,36 +110,28 @@ def get_dict_template(name: str):
     
     if name == "file_check":
         sub_status = {
-            "name": attribute(),
-            "suffix": attribute(),
-            "exist": attribute(),
-            "readable": attribute(),
-            "company_info": attribute()
+            "檔案名稱": attribute(),
+            # "suffix": attribute(),
+            # "exist": attribute(),
+            "讀取": attribute(),
+            "業者代碼": attribute()
         }
         template["sub_status"] = sub_status
     elif name == "schema_check":
         sub_status = {
-            "entity_code": attribute(),
-            "column_name": attribute()
+            "業者代碼": attribute(),
+            "表格名稱": attribute()
         }
         template["sub_status"] = sub_status
     elif name == "logic_check":
         sub_status = {
-            
-            # "error_row": [], # 記錄所有error的list id
-            # "match_number": [], # 記錄每個row媒合編號的情況 
-            # "recipient": [], # 記錄每個row申請人/受款人的情況 
-            # "cash_unique": [], # 記錄每個row金額的唯一性 
-            # "case_unique": [], # 記錄每個row案件的唯一性(表九)
-            # "date": [], # 記錄每個row時間的情況(表九)
-            # "fee": [], # 記錄每個row金額的情況 (not yet) 
-            # "error_row": attribute(), # 記錄所有error的list id
             "match_numbers": attribute(status=True, info=[]), # 記錄每個row媒合編號的情況 
             "recipients": attribute(status=True, info=[]), # 記錄每個row申請人/受款人的情況 
             "cash_uniques": attribute(status=True, info=[]), # 記錄每個row金額的唯一性 
+            "cashs": attribute(status=True, info=[]), # 記錄每個row金額的情況 (not yet) 
             "case_uniques": attribute(status=True, info=[]), # 記錄每個row案件的唯一性(表九)
             "dates": attribute(status=True, info=[]), # 記錄每個row時間的情況(表九)
-            "fees": attribute(status=True, info=[]), # 記錄每個row金額的情況 (not yet) 
+            
         }
         template["sub_status"] = sub_status
     elif name == "matchnumber_check":
@@ -109,9 +169,9 @@ def get_dict_template(name: str):
         }
 
         template["sub_status"] = sub_status
-    elif name == "fee_check":
+    elif name == "cash_check":
         sub_status = {
-            "fee": attribute(),
+            "cash": attribute(),
             "period": attribute(),
             "apply": attribute(),
         }
@@ -120,6 +180,7 @@ def get_dict_template(name: str):
     else:
         return None
     return template
+
     
 def is_int(s):
     try:
@@ -188,7 +249,8 @@ def load_schema(path,
             ]
             return df.columns.tolist()
         else:
-            return np.where(pd.isna(df), '', df).tolist()
+            arr = np.where(pd.isna(df), '', df)
+            return arr[arr[:, 1] != ''].tolist()
 
         
     except Exception as e:

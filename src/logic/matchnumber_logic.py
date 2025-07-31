@@ -48,6 +48,7 @@ def valid_matching_number(matching_code: str, phase: str, county_code_:str) -> d
         company_name, county_code, version, numbertype, contract, period_type, serial_number = match.groups()
         result["status"]["status"] = True
         result["status"]["info"] = {
+            "number": matching_code,
             "company_name": company_name,
             "county_code": county_code,
             "version": version,
@@ -56,11 +57,11 @@ def valid_matching_number(matching_code: str, phase: str, county_code_:str) -> d
             "period_type": period_type,
             "serial_number": serial_number
         }
-        result["status"]["message"] = "✅ 格式正確"
+        result["status"]["message"] = "格式正確"
     else:
         result["status"]["status"] = False
         result["status"]["info"] = None
-        result["status"]["message"] = "❌ 格式錯誤"
+        result["status"]["message"] = "格式錯誤"
 
         # 詳細檢查每個部分
         # 1. 檢查業者名稱（1-4個中文字）--> id_company
@@ -70,13 +71,13 @@ def valid_matching_number(matching_code: str, phase: str, county_code_:str) -> d
         if dealer_match:
             result["sub_status"]["match_number"]["status"] = True
             result["sub_status"]["match_number"]["info"] = matching_code
-            result["sub_status"]["match_number"]["message"] = "✅ 業者名稱格式正確"
+            result["sub_status"]["match_number"]["message"] = "業者名稱格式正確"
             
         else:
             # errors.append(f"業者名稱格式錯誤: {matching_code}。業者名稱須為1~4個中文字")
             result["sub_status"]["match_number"]["status"] = False
             result["sub_status"]["match_number"]["info"] = matching_code
-            result["sub_status"]["match_number"]["message"] = "❌ 業者名稱格式錯誤"
+            result["sub_status"]["match_number"]["message"] = "業者名稱格式錯誤"
 
             if dealer_match == None:
                 return result
@@ -135,15 +136,15 @@ def is_county(remaining, company_code):
     # 2. 檢查縣市代號（A-F）
     if len(remaining) == 0:
         # errors.append("縣市代碼開始出現缺漏！請檢媒合編號是否正確")
-        return False, "break", "❌ 縣市代碼開始出現缺漏！請檢媒合編號是否正確"
+        return False, "break", "縣市代碼開始出現缺漏！請檢媒合編號是否正確"
     elif remaining[0] != company_code:
         # errors.append(f"縣市代號缺漏或格式錯誤: {remaining[0]}。縣市代號須為 A-F")
-        return False, None, f"❌ 縣市代號錯誤: {remaining[0]}。縣市代號須為 A-F"
+        return False, None, f"縣市代號錯誤: {remaining[0]}。縣市代號須為 A-F"
     elif len(remaining) > 11 or len(remaining) < 10:
         # errors.append(f"縣市代碼後長度不符: {remaining}！請檢查媒合編號是否正確")
-        return False, None, f"❌ 縣市代碼後長度不符: {remaining}！請檢查媒合編號是否正確"
+        return False, None, f"縣市代碼後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
-        return True, county_code_dict[remaining[0]], "✅ 縣市代碼正確"
+        return True, county_code_dict[remaining[0]], "縣市代碼正確"
         # remaining = remaining[1:]
 
 def is_version(remaining):
@@ -151,62 +152,62 @@ def is_version(remaining):
     
     if len(remaining) == 0:
         # errors.append("縣市版／公會版代碼開始出現缺漏！請檢媒合編號是否正確")
-        return False, "break", "❌ 縣市版／公會版代碼開始出現缺漏！請檢媒合編號是否正確"
+        return False, "break", "縣市版／公會版代碼開始出現缺漏！請檢媒合編號是否正確"
     elif remaining[0] not in '12':
         # errors.append(f"縣市版或公會版代碼缺漏或格式錯誤: {remaining[0]}。縣市版或公會版代碼須為1或2")
-        return False, None, f"❌ 縣市版或公會版代碼缺漏或格式錯誤: {remaining[0]}。縣市版或公會版代碼須為1或2"
+        return False, None, f"縣市版或公會版代碼缺漏或格式錯誤: {remaining[0]}。縣市版或公會版代碼須為1或2"
     elif len(remaining) > 10 or len(remaining) < 9:
         # errors.append(f"縣市版或公會版代碼後長度不符: {remaining}！請檢查媒合編號是否正確")
-        return False, None, f"❌ 縣市版或公會版代碼後長度不符: {remaining}！請檢查媒合編號是否正確"
+        return False, None, f"縣市版或公會版代碼後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
-        return False, version_dict[remaining[0]], f"✅ 縣市版／公會版代碼正確"
+        return False, version_dict[remaining[0]], f"縣市版／公會版代碼正確"
         # remaining = remaining[1:]
 
 def is_numbertype(remaining):
     #  4. 檢查媒合編號類型（M）numbertype
     if len(remaining) == 0:
         # errors.append("媒合編號類型開始出現缺漏！請檢媒合編號是否正確")
-        return False, "break", "❌ 媒合編號類型開始出現缺漏！請檢媒合編號是否正確"
+        return False, "break", "媒合編號類型開始出現缺漏！請檢媒合編號是否正確"
     elif remaining[0] != 'M' or 'M' not in remaining:
         # errors.append(f"媒合編號類型缺漏或格式錯誤: {remaining[0]}。媒合編號類型須為大寫M")
-        return False, None, f"❌ 媒合編號類型缺漏或格式錯誤: {remaining[0]}。媒合編號類型須為大寫M"
+        return False, None, f"媒合編號類型缺漏或格式錯誤: {remaining[0]}。媒合編號類型須為大寫M"
     elif len(remaining) > 9 or len(remaining) < 8:
         # errors.append(f"媒合編號後長度不符: {remaining}！請檢查媒合編號是否正確")
-        return False, None, f"❌ 媒合編號後長度不符: {remaining}！請檢查媒合編號是否正確"
+        return False, None, f"媒合編號後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
         # remaining = remaining[1:]
-        return True, numbertype_dict[remaining[0]], f"✅ 媒合編號正確"
+        return True, numbertype_dict[remaining[0]], f"媒合編號正確"
 
 def is_contract(remaining):
     # 5. 檢查契約類型（1、2或3）
     if len(remaining) == 0:
         # errors.append("契約類型開始出現缺漏！請檢媒合編號是否正確")
-        return False, "break", "❌ 契約類型開始出現缺漏！請檢媒合編號是否正確"
+        return False, "break", "契約類型開始出現缺漏！請檢媒合編號是否正確"
         
     elif remaining[0] not in '123':
         # errors.append(f"契約類型缺漏或格式錯誤: {remaining[0]}。契約類型須為1、2或3")
-        return False, None, f"❌ 契約類型缺漏或格式錯誤: {remaining[0]}。契約類型須為1、2或3"
+        return False, None, f"契約類型缺漏或格式錯誤: {remaining[0]}。契約類型須為1、2或3"
     elif len(remaining) > 8 or len(remaining) < 7:
         # errors.append(f"契約類型後長度不符: {remaining}！請檢查媒合編號是否正確")
-        return False, None, f"❌ 契約類型後長度不符: {remaining}！請檢查媒合編號是否正確"
+        return False, None, f"契約類型後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
         # remaining = remaining[1:]
-        return True, contract_dict[remaining[0]], f"✅ 契約類型正確"
+        return True, contract_dict[remaining[0]], f"契約類型正確"
 
 def is_periodtype(remaining, phase):
     # 6. 檢查計畫期別（2、3、31、4、41）
     if len(remaining) == 0:
         # errors.append("計畫期別開始出現缺漏！請檢媒合編號是否正確")
-        return False, "break", "❌ 計畫期別開始出現缺漏！請檢媒合編號是否正確"
+        return False, "break", "計畫期別開始出現缺漏！請檢媒合編號是否正確"
     elif remaining[:len(phase)] != phase:
         # errors.append(f"計畫期別缺漏或格式錯誤: {remaining[:len(phase)]}。計畫期別須為{phase}")
-        return False, None, f"❌ 計畫期別缺漏或格式錯誤: {remaining[:len(phase)]}。計畫期別須為{phase}"
+        return False, None, f"計畫期別缺漏或格式錯誤: {remaining[:len(phase)]}。計畫期別須為{phase}"
     elif len(remaining) > 5 or len(remaining) < 5:
         # errors.append(f"計畫期別後長度不符: {remaining}！請檢查媒合編號是否正確")
-        return False, None, f"❌ 計畫期別後長度不符: {remaining}！請檢查媒合編號是否正確"
+        return False, None, f"計畫期別後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
         # remaining = remaining[len(phase):]
-        return True, phase, "✅ 計畫期別正確"
+        return True, phase, "計畫期別正確"
 
 def is_serial_number(remaining):
     # 7. 檢查流水號（5位數字）
@@ -216,14 +217,14 @@ def is_serial_number(remaining):
         if len(remaining) == 0:
             # errors.append("流水號缺漏")
             # return False, None, errors
-            message = "❌ 流水號缺漏"
+            message = "流水號缺漏"
         elif len(remaining) > 5 or len(remaining) < 5:
             # errors.append(f"流水號長度不符(應為5位數字): {remaining}！請檢查媒合編號是否正確")
-            message = f"❌ 流水號長度不符(應為5位數字): {remaining}！請檢查媒合編號是否正確"
+            message = f"流水號長度不符(應為5位數字): {remaining}！請檢查媒合編號是否正確"
         else:
             # errors.append(f"流水號格式錯誤(應為5位數字): {remaining}！請檢查媒合編號是否正確")
-            message = f"❌ 流水號格式錯誤(應為5位數字): {remaining}！請檢查媒合編號是否正確"
+            message = f"流水號格式錯誤(應為5位數字): {remaining}！請檢查媒合編號是否正確"
 
         return False, None, message
     else:
-        return True, remaining, "✅ 流水號格式正確"
+        return True, remaining, "流水號格式正確"
