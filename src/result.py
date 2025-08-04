@@ -14,7 +14,7 @@ logger = setup_logger(name=__name__, file_path=f'{log_path}/{__name__}.log')
 
 class Result:
     def __init__(self,
-                 file_name: str|Path,
+                 file_name: str,
                  result_path: str|Path = result_path):
         self.fname = file_name
         self.result_path = result_path
@@ -29,9 +29,7 @@ class Result:
         return {
             "name": self.fname,
             "result": {
-                "path_check": get_dict_template("path_check"),
                 "file_check": get_dict_template("file_check"),
-                "filename_check": get_dict_template("filename_check"),
                 "schema_check": get_dict_template("schema_check"),
                 "logic_check": get_dict_template("logic_check")
             }
@@ -68,7 +66,7 @@ class Result:
         Returns:
             bool: 是否成功保存結果
         """
-        print_pretty(self.result)
+        # print_pretty(self.result)
         try:
             # 讀取現有結果
             try:

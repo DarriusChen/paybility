@@ -113,24 +113,31 @@ def is_idformat_valid(id: str):
     
 def check_ID(id = "A123456789"):
     # print(f"ID: {id}")
-    if is_idformat_valid(id):
-        letter = str(id[0]).upper()
-        number = id[1:]
-        
-        code = get_letter_digits(letter)
-        code += number
-        weight = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1]
-        
-        total = 0
-        for c, w in zip(code, weight):
-            total += int(c) * int(w)
-        
-        if total % 10 == 0:
-            # print("✅")
-            return True, str(id), "✅ 身分證正確"
+    if isinstance(id, str):   
+        if is_idformat_valid(id):
+            letter = str(id[0]).upper()
+            number = id[1:]
+            
+            code = get_letter_digits(letter)
+            code += number
+            weight = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1]
+            
+            total = 0
+            for c, w in zip(code, weight):
+                total += int(c) * int(w)
+            
+            if total % 10 == 0:
+                # print("✅")
+                return True, str(id), "✅ 身分證正確"
+            else:
+                # print("❌")
+                return False, str(id), "❌ 身分證錯誤"
         else:
             # print("❌")
             return False, str(id), "❌ 身分證錯誤"
+    else:
+        # print("❌")
+        return False, str(id), "❌ 身分證錯誤"
 
 def is_bank_vaild(code: str):
     if is_int(code) and len(code) <= 3:

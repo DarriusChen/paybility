@@ -12,13 +12,14 @@ def contains_true(d: dict):
     return True
         
 def where_false(d: dict):
-    for k, v in d["result"].items():
-        # print(k, v["status"]["status"])
-        if v["status"]["status"] == False:
-            # print(v["sub_status"], type(v["sub_status"]))
-            for k_, v_ in v["sub_status"].items():
-                # if v_["status"] == False:
-                print(k_, v_["message"])
+    if d.get("result"):
+        for k, v in d["result"].items():
+            # print(k, v["status"]["status"])
+            if v["status"]["status"] == False:
+                # print(v["sub_status"], type(v["sub_status"]))
+                for k_, v_ in v["sub_status"].items():
+                    # if v_["status"] == False:
+                    print(k_, v_["message"])
             
            
 root_path = Path("data\\41期").resolve()
@@ -28,7 +29,7 @@ total = 0
 correct = 0
 error = 0
 
-
+result_dict = {}
     
 for path in root_path.rglob("*"):
     

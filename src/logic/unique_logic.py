@@ -1,6 +1,6 @@
 from utils.utils import is_int, get_dict_template
 import numpy as np
-def valid_uniqueinfo(items: list):
+def valid_uniqueinfo(items: list[str], names: list[str]):
     """檢查受款人資訊是否正確
     
     Args:
@@ -11,7 +11,7 @@ def valid_uniqueinfo(items: list):
     """
     result = get_dict_template("unique_check")
 
-    status, info, message = is_unique(items)
+    status, info, message = is_unique(items, names)
     result['sub_status']['unique']['status'] = status
     result['sub_status']['unique']['info'] = info
     result['sub_status']['unique']['message'] = message
@@ -26,7 +26,7 @@ def valid_uniqueinfo(items: list):
         result["status"]["message"] = f"❌ {result['sub_status']['unique']['info']}格式錯誤"
     return result
 
-def is_unique(items: list):
+def is_unique(items: list, names:list):
     
     if set(items) == {1}:
     # casetype

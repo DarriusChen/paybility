@@ -12,8 +12,24 @@ county_code_dict = {
     "高雄市": "F",
 }
 # TODO: 縣市代碼資料庫
+version_dict = {
+    "1": "縣市版",
+    "2": "公會版" 
+}
 
-def valid_matching_number(matching_code: str, phase: str) -> dict:
+numbertype_dict = {
+    "M": "媒合編號",
+    "T": "房客編號",
+    "H": "物件編號"
+}
+
+contract_dict = {
+    "1": "代租",
+    "2": "轉租",
+    "3": "包租"
+}
+
+def valid_matching_number(matching_code: str, phase: str, county_code_:str) -> dict:
     """
     驗證媒合編號是否符合格式。
     
@@ -21,17 +37,25 @@ def valid_matching_number(matching_code: str, phase: str) -> dict:
         matching_code: 媒合編號
         phase: 計畫期別
     Returns:
-        bool: 是否符合格式
+        dict
     """
 
     result = get_dict_template("matchnumber_check")
     
-    pattern = r"^([\u4e00-\u9fff]{1,4})([A-F]{1})([12])(M)([123])(2|3|31|4|41)(\d{5})$"
+    pattern = rf"^([\u4e00-\u9fff]{{1,4}})({county_code_})([12])(M)([123])(2|3|31|4|41)(\d{{5}})$"
     match = re.match(pattern, matching_code)
-
     if match:
+        company_name, county_code, version, numbertype, contract, period_type, serial_number = match.groups()
         result["status"]["status"] = True
-        result["status"]["info"] = None
+        result["status"]["info"] = {
+            "company_name": company_name,
+            "county_code": county_code,
+            "version": version,
+            "numbertype": numbertype,
+            "contract": contract,
+            "period_type": period_type,
+            "serial_number": serial_number
+        }
         result["status"]["message"] = "✅ 格式正確"
     else:
         result["status"]["status"] = False
@@ -43,83 +67,88 @@ def valid_matching_number(matching_code: str, phase: str) -> dict:
         dealer_pattern = r"^([\u4e00-\u9fff]{1,4})"
         dealer_match = re.match(dealer_pattern, matching_code)
         
-        if not dealer_match:
-            # errors.append(f"業者名稱格式錯誤: {matching_code}。業者名稱須為1~4個中文字")
-            result["sub_status"]["matching_code"]["status"] = False
-            result["sub_status"]["matching_code"]["info"] = matching_code
-            result["sub_status"]["matching_code"]["message"] = "❌ 業者名稱格式錯誤"
+        if dealer_match:
+            result["sub_status"]["match_number"]["status"] = True
+            result["sub_status"]["match_number"]["info"] = matching_code
+            result["sub_status"]["match_number"]["message"] = "✅ 業者名稱格式正確"
+            
         else:
-            result["sub_status"]["matching_code"]["status"] = True
-            result["sub_status"]["matching_code"]["info"] = matching_code
-            result["sub_status"]["matching_code"]["message"] = "✅ 業者名稱格式正確"
+            # errors.append(f"業者名稱格式錯誤: {matching_code}。業者名稱須為1~4個中文字")
+            result["sub_status"]["match_number"]["status"] = False
+            result["sub_status"]["match_number"]["info"] = matching_code
+            result["sub_status"]["match_number"]["message"] = "❌ 業者名稱格式錯誤"
 
-        dealer_name = dealer_match.group(1)
-        remaining = matching_code[len(dealer_name):]
+            if dealer_match == None:
+                return result
+            # print(dealer_match.group(0))
+            dealer_name = dealer_match.group(1)
+            remaining = matching_code[len(dealer_name):]
 
-        status, info, message = is_county(remaining)
-        result["sub_status"]["county"]["status"] = status
-        result["sub_status"]["county"]["info"] = info
-        result["sub_status"]["county"]["message"] = message
-        if info =="break":
-            return result
-        remaining = remaining[1:]
+            status, info, message = is_county(remaining, county_code_) 
+            result["sub_status"]["county"]["status"] = status
+            result["sub_status"]["county"]["info"] = info
+            result["sub_status"]["county"]["message"] = message
+            if info =="break":
+                return result
+            remaining = remaining[1:]
 
-        status, info, message = is_version(remaining)
-        result["sub_status"]["version"]["status"] = status
-        result["sub_status"]["version"]["info"] = info
-        result["sub_status"]["version"]["message"] = message
-        if info =="break":
-            return result
-        remaining = remaining[1:]
+            status, info, message = is_version(remaining)
+            result["sub_status"]["version"]["status"] = status
+            result["sub_status"]["version"]["info"] = info
+            result["sub_status"]["version"]["message"] = message
+            if info =="break":
+                return result
+            remaining = remaining[1:]
 
-        status, info, message = is_numbertype(remaining)
-        result["sub_status"]["numbertype"]["status"] = status
-        result["sub_status"]["numbertype"]["info"] = info
-        result["sub_status"]["numbertype"]["message"] = message
-        if info =="break":
-            return result
-        remaining = remaining[1:]
+            status, info, message = is_numbertype(remaining)
+            result["sub_status"]["numbertype"]["status"] = status
+            result["sub_status"]["numbertype"]["info"] = info
+            result["sub_status"]["numbertype"]["message"] = message
+            if info =="break":
+                return result
+            remaining = remaining[1:]
 
-        status, info, message = is_contract(remaining)
-        result["sub_status"]["contract"]["status"] = status
-        result["sub_status"]["contract"]["info"] = info
-        result["sub_status"]["contract"]["message"] = message
-        if info =="break":
-            return result
-        remaining = remaining[1:]
+            status, info, message = is_contract(remaining)
+            result["sub_status"]["contract"]["status"] = status
+            result["sub_status"]["contract"]["info"] = info
+            result["sub_status"]["contract"]["message"] = message
+            if info =="break":
+                return result
+            remaining = remaining[1:]
 
-        status, info, message = is_periodtype(remaining, phase)
-        result["sub_status"]["periodtype"]["status"] = status
-        result["sub_status"]["periodtype"]["info"] = info
-        result["sub_status"]["periodtype"]["message"] = message
-        if info =="break":
-            return result
-        remaining = remaining[1:]
+            status, info, message = is_periodtype(remaining, phase)
+            result["sub_status"]["periodtype"]["status"] = status
+            result["sub_status"]["periodtype"]["info"] = info
+            result["sub_status"]["periodtype"]["message"] = message
+            if info =="break":
+                return result
+            remaining = remaining[1:]
 
-        status, info, message = is_serial_number(remaining)
-        result["sub_status"]["serial_number"]["status"] = status
-        result["sub_status"]["serial_number"]["info"] = info
-        result["sub_status"]["serial_number"]["message"] = message
+            status, info, message = is_serial_number(remaining)
+            result["sub_status"]["serial_number"]["status"] = status
+            result["sub_status"]["serial_number"]["info"] = info
+            result["sub_status"]["serial_number"]["message"] = message
        
     return result
 
-def is_county(remaining):
+def is_county(remaining, company_code):
     # 2. 檢查縣市代號（A-F）
     if len(remaining) == 0:
         # errors.append("縣市代碼開始出現缺漏！請檢媒合編號是否正確")
         return False, "break", "❌ 縣市代碼開始出現缺漏！請檢媒合編號是否正確"
-    elif remaining[0] not in county_code_dict.values():
+    elif remaining[0] != company_code:
         # errors.append(f"縣市代號缺漏或格式錯誤: {remaining[0]}。縣市代號須為 A-F")
-        return False, None, f"❌ 縣市代號缺漏或格式錯誤: {remaining[0]}。縣市代號須為 A-F"
+        return False, None, f"❌ 縣市代號錯誤: {remaining[0]}。縣市代號須為 A-F"
     elif len(remaining) > 11 or len(remaining) < 10:
         # errors.append(f"縣市代碼後長度不符: {remaining}！請檢查媒合編號是否正確")
         return False, None, f"❌ 縣市代碼後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
-        return True, None, "✅ 縣市代碼正確"
+        return True, county_code_dict[remaining[0]], "✅ 縣市代碼正確"
         # remaining = remaining[1:]
 
 def is_version(remaining):
     # 3. 檢查縣市/公會版（1或2）
+    
     if len(remaining) == 0:
         # errors.append("縣市版／公會版代碼開始出現缺漏！請檢媒合編號是否正確")
         return False, "break", "❌ 縣市版／公會版代碼開始出現缺漏！請檢媒合編號是否正確"
@@ -130,7 +159,7 @@ def is_version(remaining):
         # errors.append(f"縣市版或公會版代碼後長度不符: {remaining}！請檢查媒合編號是否正確")
         return False, None, f"❌ 縣市版或公會版代碼後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
-        return False, None, f"✅ 縣市版／公會版代碼正確"
+        return False, version_dict[remaining[0]], f"✅ 縣市版／公會版代碼正確"
         # remaining = remaining[1:]
 
 def is_numbertype(remaining):
@@ -146,7 +175,7 @@ def is_numbertype(remaining):
         return False, None, f"❌ 媒合編號後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
         # remaining = remaining[1:]
-        return True, None, f"✅ 媒合編號正確"
+        return True, numbertype_dict[remaining[0]], f"✅ 媒合編號正確"
 
 def is_contract(remaining):
     # 5. 檢查契約類型（1、2或3）
@@ -162,7 +191,7 @@ def is_contract(remaining):
         return False, None, f"❌ 契約類型後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
         # remaining = remaining[1:]
-        return True, None, f"✅ 契約類型正確"
+        return True, contract_dict[remaining[0]], f"✅ 契約類型正確"
 
 def is_periodtype(remaining, phase):
     # 6. 檢查計畫期別（2、3、31、4、41）
@@ -177,7 +206,7 @@ def is_periodtype(remaining, phase):
         return False, None, f"❌ 計畫期別後長度不符: {remaining}！請檢查媒合編號是否正確"
     else:
         # remaining = remaining[len(phase):]
-        return True, None, "✅ 計畫期別正確"
+        return True, phase, "✅ 計畫期別正確"
 
 def is_serial_number(remaining):
     # 7. 檢查流水號（5位數字）
@@ -197,41 +226,4 @@ def is_serial_number(remaining):
 
         return False, None, message
     else:
-        return True, None, "✅ 流水號格式正確"
-
-# def validate_matching_numbers(data_file: str | Path,
-#                              logger: logging.Logger,
-#                              phase: str) -> dict:
-#     """驗證媒合編號是否符合格式。
-    
-#     Args:
-#         data_file: 資料檔案路徑
-#         phase: 計畫期別
-#     """
-#     try:
-#         df_matching_number = load_data(path=data_file,
-#                                        header_rows=[2, 3],
-#                                        logger=logger)
-#         matching_numbers = df_matching_number.iloc[:,0].dropna().to_list()
-#         errors = []
-#         for idx, number in enumerate(matching_numbers):
-#             error_result = is_valid_matching_number(number, phase)
-#             if error_result:
-#                 errors.append(f"第{idx+1}筆: {number} 不符合格式")
-#         if not errors:
-#             logic_result['sub_status']['matching_number']['status'] = True
-#             logic_result['sub_status']['matching_number']['info'] = len(matching_numbers)
-#             logic_result['sub_status']['matching_number']['message'] = "✅ 媒合編號格式正確"
-#         else:
-#             logic_result['sub_status']['matching_number']['status'] = False
-#             logic_result['sub_status']['matching_number']['info'] = len(errors)
-#             logic_result['sub_status']['matching_number']['message'] = f"❌ 媒合編號格式錯誤: {errors}"
-
-#         return logic_result
-    
-#     except Exception as e:
-#         logger.error(format_func_msg(func='validate_matching_numbers', msg=f"驗證媒合編號時發生錯誤: {e}"))
-#         return None
-
-
-
+        return True, remaining, "✅ 流水號格式正確"

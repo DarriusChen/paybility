@@ -39,7 +39,11 @@ def valid_dateinfo(dates: list):
 
 def is_valid_date(date_str: str, flag: str):
     try:
-        parts = date_str.split('/')
+        if '/' not in str(date_str):
+            return False, None, f"❌ {flag}錯誤時間格式"
+        
+        else:
+            parts = date_str.split('/')
         if len(parts) != 3:
             return False, None, f"❌ {flag}錯誤時間格式"
         
