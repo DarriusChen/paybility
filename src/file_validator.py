@@ -4,9 +4,12 @@ import re
 
 from pathlib import Path
 from logger import setup_logger, format_func_msg
-from utils.utils import MAX_YEAR, MIN_YEAR, PERIOD, COUNTY, MAPPING_FILE, TABLES, LOG_PATH, get_dict_template, is_int,  load_schema
+from utils.utils import MAX_YEAR, MIN_YEAR, PERIOD, COUNTY, MAPPING_FILE, TABLES, LOG_PATH, get_dict_template, is_int, load_schema
+from database import DatabaseService
 
 logger = setup_logger(name=__name__, file_path=f'{LOG_PATH}/{__name__}.log')
+
+db = DatabaseService()
 
         
 def validate_path(file):
@@ -113,21 +116,12 @@ def check_name(path):
 
         return False, result, "\n".join(errors)
     
-def is_valid_company(name_code = ""):
-    
-    mapping_df = pd.read_excel(MAPPING_FILE,
-                        sheet_name="4-1",
-                        header=0)
-    # mapping_df[['縣市', '縣市代碼']] = mapping_df[['縣市', '縣市代碼']].ffill()
-    mapping_df.loc[:, ['縣市', '縣市代碼', '業者名稱', '系統業者代號']] = mapping_df.loc[:, ['縣市', '縣市代碼', '業者名稱', '系統業者代號']].ffill()
-    
-    result = mapping_df[mapping_df['系統業者代號']==name_code]
-    
-    if not result.empty:
-        result = result.iloc[0].to_dict()
-        return True, result, f"✅ 系統業者代號相符: {result['系統業者代號']}"
+def is_valid_company(company_code: str):
+    result, _ = db.get_data(table_name="Dim_Vendor", column_name="VENDOR_CODE", value=company_code)
+    if result:
+        return True, result, f"✅ 業者代號相符: {result[0]['VENDOR_CODE']}"
     else:
-        return False, None, f"❌ 系統業者代號相異"
+        return False, None, "❌ 業者代號有誤"
 
 def is_valid_suffix(file: Path):
     if file.suffix in [".xlsx", ".xls"]:
