@@ -1,7 +1,7 @@
-from utils.utils import is_int, get_dict_template
+from utils.utils import Result
 import numpy as np
-def valid_uniqueinfo(items: dict):
-    """檢查受款人資訊是否正確
+def valid_uniquecase(result: Result):
+    """檢查案件唯一性
     
     Args:
         items:
@@ -9,21 +9,34 @@ def valid_uniqueinfo(items: dict):
         dict:
         
     """
-    result = get_dict_template("unique_check")
-
-    status, info, message = is_unique(items)
-    result["status"]["status"] = status
-    result["status"]["info"] = info
-    result["status"]["message"] = message
-    return result
-
-def is_unique(items:dict):
+    item_list = result.get_caselist()
     unique_list = []
-    for k, v in items.items():
-        if v != '':
-            unique_list.append(k)
+    for i in item_list:
+        if result.get_row(i) != '':
+            unique_list.append(i)
 
     if len(unique_list) != 1:
-        return False, unique_list, f"多筆金額在同一行 {unique_list}"
+        result.insert_rowerror(f"案件", f"多筆案件在同一行 {unique_list}")
     else:
-        return True, unique_list[0], unique_list[0]
+        result.insert_rowinfo("案件", unique_list[0])
+
+def valid_uniquecash(result: Result):
+    """檢查費用唯一性
+    
+    Args:
+        items:
+    Returns:
+        dict:
+        
+    """
+    item_list = result.get_cashlist()
+    unique_list = []
+    for i in item_list:
+        if result.get_row(i) != '':
+            unique_list.append(i)
+
+    if len(unique_list) != 1:
+        result.insert_rowerror(f"費用", f"多筆費用在同一行 {unique_list}")
+    else:
+        result.insert_rowinfo("費用", unique_list[0])
+

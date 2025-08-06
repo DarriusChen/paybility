@@ -5,7 +5,8 @@ from utils.utils import RESULT_PATH
 import uuid
 from database import DatabaseService
 
-from result import Result
+# from result import Result
+from utils.utils import Result
 from file_validator import validate_path
 from schema_validator import validate_schema
 from logic_validator import validate_logic
@@ -14,7 +15,6 @@ from logic_validator import validate_logic
 # 用 session_state 儲存日誌，避免每次重新執行就消失
 if "log_lines" not in st.session_state:
     st.session_state.log_lines = {}
-
 
 if 'show_result' not in st.session_state:
     st.session_state.show_result = False
@@ -26,52 +26,6 @@ if "database_service" not in st.session_state:
     st.session_state.database_service = DatabaseService()
 
 # Test function
-def normalize_format(name:str, result: dict, checktype:str):
-    def pretty_append(d = None):
-        if d == None:
-            _ = "---"
-            msg = ""
-        elif d["status"] == True:
-            _ = "✔"
-            msg = d['message']
-        else:
-            _ = "✖"  
-            msg = d['message']
-        st.session_state.log_lines[name][checktype][k].append(f"{_} : {msg}")
-
-    if st.session_state.log_lines[name].get(checktype) == None:
-        st.session_state.log_lines[name][checktype] = {}
-
-    for k, v in result["sub_status"].items():
-        if st.session_state.log_lines[name][checktype].get(k) == None:
-            st.session_state.log_lines[name][checktype][k] = []
-
-        if checktype == "表單內容":
-            
-            for rowinfo in v["info"]:
-
-                pretty_append(rowinfo['status'])
-            
-
-        else:
-            pretty_append(v)
-
-    # append length 這個暫時的寫法會影響金額邏輯加入後的結果
-    maxl = 0
-    tmp = []
-    
-    if checktype == "表單內容":
-        
-        for k, v in st.session_state.log_lines[name][checktype].items():
-            # print(k, len(v))
-            
-            if len(v) > maxl:
-                maxl = len(v)
-            if len(v) == 0:
-                tmp.append(k)
-
-        for tmp_k in tmp:
-            st.session_state.log_lines[name][checktype][tmp_k] = ["---"] * maxl
 
 
     
@@ -82,39 +36,33 @@ def test_validate_file(files, result_path):
     
     for i, file in enumerate(files):
         # print(i, file)
-        st.session_state.log_lines[file.name] = {}
+        validation = Result(file.name)
+        print(file.name)
         # st.session_state.log_lines.append(f"檔案類型: {file.type}")
         # st.session_state.log_lines.append(f"檔案大小: {file.size} bytes")
-        
-        file_check_result = validate_path(file)
-        
-        normalize_format(file.name, file_check_result, "檔案名稱")
-        
-        if file_check_result["status"]["status"]:
-        
-            # parameters
-            data_frame = file_check_result["sub_status"]["讀取"]["info"]
-            file_type = file_check_result["sub_status"]["檔案名稱"]["info"]["表種"]
-            county_code = file_check_result["sub_status"]["業者代碼"]["info"]["縣市代碼"]
-            company_code = file_check_result["sub_status"]["業者代碼"]["info"]["系統業者代號"]
-            period = file_check_result["sub_status"]["檔案名稱"]["info"]["期別"]
 
-            # ------------------------------
-            
-            schema_result = validate_schema(data_file=data_frame,
-                                    file_type=file_type,           
-                                    company_code=company_code)
-            
-            
-            normalize_format(file.name, schema_result, "表頭")      
 
-            # ------------------------------
-            logic_result = validate_logic( data_frame,
-                                    file_type=file_type,
-                                    phase=period,
-                                    county_code=county_code)
+        # file_validator)
+        validate_path(file, validation)
+        
+        # normalize_format(file.name, file_check_result, "檔案名稱")
+        
+        
+        if validation.get_status():
+            # schema_validator
             
-            normalize_format(file.name, logic_result, "表單內容")
+            validate_schema(validation)
+
+            if validation.get_status():
+                # logic_validator
+                validate_logic(validation)
+                # validation.show()
+
+        st.session_state.log_lines[file.name] = validation
+        #     # ------------------------------
+        #     logic_result = validate_logic(result=result["logic_validator"])
+            
+        #     normalize_format(file.name, logic_result, "表單內容")
 
 
     # st.session_state.log_lines.append("=== 驗證完成 ===")
@@ -152,18 +100,18 @@ def streamlit_app(result_path: str = RESULT_PATH):
     
     if st.session_state.show_result:
         st.button("關閉結果", on_click=close_result, key="close_result_button", icon="✖")
-        for file_name, checks in st.session_state.log_lines.items():
+        for file_name, result in st.session_state.log_lines.items():
+
             
             with st.expander(file_name):
-                for check_level, check_dict in checks.items():
-                    # if checks != {}:
-                    with st.expander(check_level):
-                        # for k, v in check_dict.items():
-                            # print(k, len(v))
-                        df = pd.DataFrame(check_dict)
-                        st.dataframe(df)
-                    # else:
-                    #     st.write(file_name)
+                if not result.get_status("file_validator"):
+                    st.write("檔案名稱錯誤")
+                    st.write(result.get_error("file_validator"))
+                elif not result.get_status("schema_validator"):
+                    st.write("表單內容錯誤")
+                    st.write(result.get_error("schema_validator"))
+                else:
+                    st.dataframe(result.to_dataframe())
 
     
 
@@ -219,7 +167,7 @@ def test1():
     st.subheader("步驟1: 單筆媒合編號及加總\n")
     left, right = st.columns(2)
     with left:
-        st.selectbox("表種", ["表4", "表7", "表9"], key="table_type")
+        st.selectbox("表種", ["表4", "表7", "表9", "GS400"], key="table_type")
     with right:
         st.text_input(label="媒合編號", placeholder="請輸入要搜尋的媒合編號", key="search_query")
     
@@ -251,21 +199,14 @@ def test1():
                                                 cash_type=k,
                                                 cash=fake,
                                                 history_cash=historycash)
-                    st.write(f"  申請費(假){fake}$  {test_result}")
-
-
-
+                    st.write(f"  申請費(假){fake}$ || {test_result}")
 
 
 
 def test2():
-    st.title("表479相關測試")
+    st.title("GS400測試")
     st.write("---")
     
-def test3():
-    st.title("表479相關測試")
-    st.write("---")
-    pass
 
 if __name__ == "__main__":
     page_names_to_funcs = {

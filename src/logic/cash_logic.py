@@ -2,7 +2,7 @@ from utils.utils import is_int
 
 from database import DatabaseService
 
-from utils.utils import load_schema
+from utils.utils import load_schema, Result
 
 # insurance_cash: 保險費
 # notarization_cash: 公證費
@@ -13,8 +13,6 @@ from utils.utils import load_schema
 # matching_cash: 媒合費
 # custody_cash: 代管費
 
-# 包租/轉租/代管期別邏輯
-# class GS400Database(DatabaseService):
 
 class CashDatabase(DatabaseService):
     def __init__(self, file_type:str, number:str):
@@ -29,6 +27,9 @@ class CashDatabase(DatabaseService):
         elif file_type == "表9":
             self.file_type = "表9"
             self.sql_type = "ContractHouse_PayTable_0205_sheet_9_plan41"
+        elif file_type == "GS400":
+            self.file_type = "GS400"
+            self.sql_type = "ContractHouse_GS400"
 
         self.number = number
         self.results = super().get_data_by_match_id(self.number, self.sql_type)
@@ -63,16 +64,10 @@ class CashDatabase(DatabaseService):
                 "媒合費": "媒合費申請金額",
                 "代管費": "代管費申請金額"
             }
+        else:
+            sql_dict = {}
         return sql_dict
 
-# # class CashCSV():
-# def load(file_type: str, number: str):
-#     if file_type == "表4":
-#         load_schema(file, header_rows=0)
-#     elif file_type == "表7":
-#         load_schema(file, header_rows=0)
-#     elif file_type == "表9":
-#         load_schema(file, header_rows=0)
     
 def check_period(period: str, total_period: str, period_type: str):
     
@@ -117,24 +112,30 @@ def limit_amount(cash: int, history_cash: int, limit: int):
     else:
         return False, None, f"✖ 超出額度   上限:{limit} | 申請: {cash} | 已使用: {history_cash}"
 
-def valid_cash(number:dict, cash_type:str, cash:int, file_type:str):
+def valid_cash(id: int, result: Result):
 
-    county_code = number["county_code"]
-    contract = number["contract"]
+    file_type = result.get_info("表種")
+    county_code = result.get_info("縣市代碼")
+    
+    number = result.get_rowinfo("媒合編號")
+    contract = result.get_rowinfo("契約類型")
+    cash_type = result.get_rowinfo("費用")
 
-    db = CashDatabase(file_type, number["number"])
+    result.update_substatus(f"費用{id}", False, "未檢查")
+    return 0
+    db = CashDatabase(file_type, number)
     
     history_cash = db.get_history_cash(cash_type)
 
     if cash_type == "保險費":
         
-        result = limit_amount(cash, history_cash, 3500)
+        cash_result= limit_amount(cash, history_cash, 3500)
     elif cash_type == "公證費":
         if county_code in "AB":
             # 雙北
-            result = limit_amount(cash, history_cash, 4500)
+            cash = limit_amount(cash, history_cash, 4500)
         else:
-            result = limit_amount(cash, history_cash, 3000)
+            cash_result= limit_amount(cash, history_cash, 3000)
     elif cash_type == "修繕費":
 
         if contract == 1:
@@ -142,11 +143,12 @@ def valid_cash(number:dict, cash_type:str, cash:int, file_type:str):
             history_cash2 = db.get_history_cash("保險費") # 過去保險費
             
             if 3500 - history_cash2 >= 0:
-                result = limit_amount(cash, history_cash, 6500 + (3500 - history_cash2), "修繕費")
+                cash_result= limit_amount(cash, history_cash, 6500 + (3500 - history_cash2), "修繕費")
             else:
+                result
                 return False, 3500 - history_cash2, f"代租 修繕費異常"
         else:
-            result = limit_amount(cash, history_cash, 10000)
+            cash_result= limit_amount(cash, history_cash, 10000)
 
     elif cash_type == "租金補助":
         if int(cash):
@@ -159,46 +161,46 @@ def valid_cash(number:dict, cash_type:str, cash:int, file_type:str):
             return True, None, f"租金補助金額異常"
     elif cash_type == "開發費":
         if county_code == "A": #台北
-            result = limit_amount(cash, history_cash, 24000)
+            cash_result= limit_amount(cash, history_cash, 24000)
         elif county_code == "B": #新北
-            result = limit_amount(cash, history_cash, 22000)
+            cash_result= limit_amount(cash, history_cash, 22000)
         elif county_code in "CD": #桃園、台中
-            result = limit_amount(cash, history_cash, 18000)
+            cash_result= limit_amount(cash, history_cash, 18000)
         elif county_code == "EF": #台南、高雄
-            result = limit_amount(cash, history_cash, 16000)
+            cash_result= limit_amount(cash, history_cash, 16000)
         else:
             return False, None, "縣市代碼錯誤"
     elif cash_type == "包管費":
         if county_code == "A": #台北
-            result = limit_amount(cash, history_cash, 4000)
+            cash_result= limit_amount(cash, history_cash, 4000)
         elif county_code == "B": #新北
-            result = limit_amount(cash, history_cash, 3600)
+            cash_result= limit_amount(cash, history_cash, 3600)
         elif county_code in "CD": #桃園、台中
-            result = limit_amount(cash, history_cash, 3000)
+            cash_result= limit_amount(cash, history_cash, 3000)
         elif county_code == "EF": #台南、高雄
-            result = limit_amount(cash, history_cash, 2600)
+            cash_result= limit_amount(cash, history_cash, 2600)
         else:
             return False, None, "縣市代碼錯誤"
     elif cash_type == "媒合費":
         if county_code == "A": #台北
-            result = limit_amount(cash, history_cash, 16000)
+            cash_result= limit_amount(cash, history_cash, 16000)
         elif county_code == "B": #新北
-            result = limit_amount(cash, history_cash, 14000)
+            cash_result= limit_amount(cash, history_cash, 14000)
         elif county_code in "CD": #桃園、台中
-            result = limit_amount(cash, history_cash, 13000)
+            cash_result= limit_amount(cash, history_cash, 13000)
         elif county_code == "EF": #台南、高雄
-            result = limit_amount(cash, history_cash, 11000)
+            cash_result= limit_amount(cash, history_cash, 11000)
         else:
             return False, None, "縣市代碼錯誤"
     elif cash_type == "代管費":
         if county_code == "A": #台北
-            result = limit_amount(cash, history_cash, 2400)
+            cash_result= limit_amount(cash, history_cash, 2400)
         elif county_code == "B": #新北
-            result = limit_amount(cash, history_cash, 2200)
+            cash_result= limit_amount(cash, history_cash, 2200)
         elif county_code in "CD": #桃園、台中
-            result = limit_amount(cash, history_cash, 1800)
+            cash_result= limit_amount(cash, history_cash, 1800)
         elif county_code == "EF": #台南、高雄
-            result = limit_amount(cash, history_cash, 1500)
+            cash_result= limit_amount(cash, history_cash, 1500)
         else:
             return False, None, "縣市代碼錯誤"
     else:
@@ -221,13 +223,13 @@ def test_valid_cash(number: str, cash_type:str, cash:str, history_cash: int):
 
         if cash_type == "保險費":
             
-            result = limit_amount(cash, history_cash, 3500)
+            cash_result= limit_amount(cash, history_cash, 3500)
         elif cash_type == "公證費":
             if county_code in "AB":
                 # 雙北
-                result = limit_amount(cash, history_cash, 4500)
+                cash_result= limit_amount(cash, history_cash, 4500)
             else:
-                result = limit_amount(cash, history_cash, 3000)
+                cash_result= limit_amount(cash, history_cash, 3000)
         elif cash_type == "修繕費":
 
             if contract == 1:
@@ -235,11 +237,11 @@ def test_valid_cash(number: str, cash_type:str, cash:str, history_cash: int):
                 # history_cash2 = db.get_history_cash("保險費") # 過去保險費
                 history_cash2 = 0
                 if 3500 - history_cash2 >= 0:
-                    result = limit_amount(cash, history_cash, 10000 - history_cash2)
+                    cash_result= limit_amount(cash, history_cash, 10000 - history_cash2)
                 else:
                     return f"代租 修繕費異常"
             else:
-                result = limit_amount(cash, history_cash, 10000)
+                cash_result= limit_amount(cash, history_cash, 10000)
 
         elif cash_type == "租金補助":
 
@@ -250,47 +252,47 @@ def test_valid_cash(number: str, cash_type:str, cash:str, history_cash: int):
 
         elif cash_type == "開發費":
             if county_code == "A": #台北
-                result = limit_amount(cash, history_cash, 24000)
+                cash_result= limit_amount(cash, history_cash, 24000)
             elif county_code == "B": #新北
-                result = limit_amount(cash, history_cash, 22000)
+                cash_result= limit_amount(cash, history_cash, 22000)
             elif county_code in "CD": #桃園、台中
-                result = limit_amount(cash, history_cash, 18000)
+                cash_result= limit_amount(cash, history_cash, 18000)
             elif county_code in "EF": #台南、高雄
-                result = limit_amount(cash, history_cash, 16000)
+                cash_result= limit_amount(cash, history_cash, 16000)
             else:
                 return "縣市代碼錯誤"
             
         elif cash_type == "包管費":
             if county_code == "A": #台北
-                result = limit_amount(cash, history_cash, 4000)
+                cash_result= limit_amount(cash, history_cash, 4000)
             elif county_code == "B": #新北
-                result = limit_amount(cash, history_cash, 3600)
+                cash_result= limit_amount(cash, history_cash, 3600)
             elif county_code in "CD": #桃園、台中
-                result = limit_amount(cash, history_cash, 3000)
+                cash_result= limit_amount(cash, history_cash, 3000)
             elif county_code in "EF": #台南、高雄
-                result = limit_amount(cash, history_cash, 2600)
+                cash_result= limit_amount(cash, history_cash, 2600)
             else:
                 return "縣市代碼錯誤"
         elif cash_type == "媒合費":
             if county_code == "A": #台北
-                result = limit_amount(cash, history_cash, 16000)
+                cash_result= limit_amount(cash, history_cash, 16000)
             elif county_code == "B": #新北
-                result = limit_amount(cash, history_cash, 14000)
+                cash_result= limit_amount(cash, history_cash, 14000)
             elif county_code in "CD": #桃園、台中
-                result = limit_amount(cash, history_cash, 13000)
+                cash_result= limit_amount(cash, history_cash, 13000)
             elif county_code in "EF": #台南、高雄
-                result = limit_amount(cash, history_cash, 11000)
+                cash_result= limit_amount(cash, history_cash, 11000)
             else:
                 return "縣市代碼錯誤"
         elif cash_type == "代管費":
             if county_code == "A": #台北
-                result = limit_amount(cash, history_cash, 2400)
+                cash_result= limit_amount(cash, history_cash, 2400)
             elif county_code == "B": #新北
-                result = limit_amount(cash, history_cash, 2200)
+                cash_result= limit_amount(cash, history_cash, 2200)
             elif county_code in "CD": #桃園、台中
-                result = limit_amount(cash, history_cash, 1800)
+                cash_result= limit_amount(cash, history_cash, 1800)
             elif county_code in "EF": #台南、高雄
-                result = limit_amount(cash, history_cash, 1500)
+                cash_result= limit_amount(cash, history_cash, 1500)
             else:
                 return "縣市代碼錯誤"
         else:
@@ -306,7 +308,7 @@ def validate_insurance_cash(cash: str, id: str):
 
     # history_cash = get_historyinsurance_cash(id)
     history_cash = 0
-    result = limit_amount(cash, history_cash, 3500)
+    cash_result= limit_amount(cash, history_cash, 3500)
    
     return result
 
@@ -319,9 +321,9 @@ def validate_notarization_cash(cash: str, id: str, county_code: str):
 
     if county_code in "AB":
         # 雙北
-        result = limit_amount(cash, history_cash, 4500)
+        cash_result= limit_amount(cash, history_cash, 4500)
     else:
-        result = limit_amount(cash, history_cash, 3000)
+        cash_result= limit_amount(cash, history_cash, 3000)
 
     return result
 
@@ -336,11 +338,11 @@ def validate_repair_cash(id: str,  cash: str, contract: str):
         # history_cash2 = get_historyinsurance_cash_cash(id) 過去保險費
         history_cash2 = 0
         if 3500 - history_cash2 >= 0:
-            result = limit_amount(cash, history_cash1, 6500 + (3500 - history_cash2), "修繕費")
+            cash_result= limit_amount(cash, history_cash1, 6500 + (3500 - history_cash2), "修繕費")
         else:
             return False, 3500 - history_cash2, f"代租 修繕費異常"
     else:
-        result = limit_amount(cash, history_cash1, 10000)
+        cash_result= limit_amount(cash, history_cash1, 10000)
 
     return result
 
@@ -363,13 +365,13 @@ def validate_development_cash(cash: str, id: str, county_code: str):
     # history_cash = get_historydevelopment_cash_cash(id)
     history_cash = 0
     if county_code == "A": #台北
-        result = limit_amount(cash, history_cash, 24000)
+        cash_result= limit_amount(cash, history_cash, 24000)
     elif county_code == "B": #新北
-        result = limit_amount(cash, history_cash, 22000)
+        cash_result= limit_amount(cash, history_cash, 22000)
     elif county_code in "CD": #桃園、台中
-        result = limit_amount(cash, history_cash, 18000)
+        cash_result= limit_amount(cash, history_cash, 18000)
     elif county_code == "EF": #台南、高雄
-        result = limit_amount(cash, history_cash, 16000)
+        cash_result= limit_amount(cash, history_cash, 16000)
     else:
         return False, None, "縣市代碼錯誤"
     
@@ -380,13 +382,13 @@ def validate_management_cash(cash: str, id: str, county_code: str, period_type: 
 
     history_cash = 0
     if county_code == "A": #台北
-        result = limit_amount(cash, history_cash, 4000)
+        cash_result= limit_amount(cash, history_cash, 4000)
     elif county_code == "B": #新北
-        result = limit_amount(cash, history_cash, 3600)
+        cash_result= limit_amount(cash, history_cash, 3600)
     elif county_code in "CD": #桃園、台中
-        result = limit_amount(cash, history_cash, 3000)
+        cash_result= limit_amount(cash, history_cash, 3000)
     elif county_code == "EF": #台南、高雄
-        result = limit_amount(cash, history_cash, 2600)
+        cash_result= limit_amount(cash, history_cash, 2600)
     else:
         return False, None, "縣市代碼錯誤"
     
@@ -396,13 +398,13 @@ def validate_matching_cash(cash: str, id: str, county_code: str):
     # 媒合費
     history_cash = 0
     if county_code == "A": #台北
-        result = limit_amount(cash, history_cash, 16000)
+        cash_result= limit_amount(cash, history_cash, 16000)
     elif county_code == "B": #新北
-        result = limit_amount(cash, history_cash, 14000)
+        cash_result= limit_amount(cash, history_cash, 14000)
     elif county_code in "CD": #桃園、台中
-        result = limit_amount(cash, history_cash, 13000)
+        cash_result= limit_amount(cash, history_cash, 13000)
     elif county_code == "EF": #台南、高雄
-        result = limit_amount(cash, history_cash, 11000)
+        cash_result= limit_amount(cash, history_cash, 11000)
     else:
         return False, None, "縣市代碼錯誤"
     
@@ -412,13 +414,13 @@ def validate_custody_cash(cash: str, id: str, county_code: str):
     # 代管費
     history_cash = 0
     if county_code == "A": #台北
-        result = limit_amount(cash, history_cash, 2400)
+        cash_result= limit_amount(cash, history_cash, 2400)
     elif county_code == "B": #新北
-        result = limit_amount(cash, history_cash, 2200)
+        cash_result= limit_amount(cash, history_cash, 2200)
     elif county_code in "CD": #桃園、台中
-        result = limit_amount(cash, history_cash, 1800)
+        cash_result= limit_amount(cash, history_cash, 1800)
     elif county_code == "EF": #台南、高雄
-        result = limit_amount(cash, history_cash, 1500)
+        cash_result= limit_amount(cash, history_cash, 1500)
     else:
         return False, None, "縣市代碼錯誤"
     

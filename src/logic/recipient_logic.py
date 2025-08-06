@@ -1,9 +1,9 @@
 import re
-from utils.utils import is_int, get_dict_template
+from utils.utils import is_int, Result
 # 申請人/受款人檢查邏輯
 
 
-def valid_recipientinfo(items:dict):
+def valid_recipientinfo(result: Result):
     """檢查受款人資訊是否正確
     
     Args:
@@ -13,58 +13,29 @@ def valid_recipientinfo(items:dict):
         result: dict{}
         
     """
-    result = get_dict_template("recipient_check")
+    # result = get_dict_template("recipient_check")
 
-    name, id_name, id_bank, id_branch, account = items.values()
-    # print(name, id_name, id_bank, id_branch, account)
-    status, info, message = is_name_valid(name)
-    result['sub_status']['name']['status'] = status
-    result['sub_status']['name']['info'] = info
-    result['sub_status']['name']['message'] = message
+    # print(name, name_id, bank_id, branch_id, account)
+    is_name_valid(result)
 
-    status, info, message = check_ID(id_name)
-    result['sub_status']['id_name']['status'] = status
-    result['sub_status']['id_name']['info'] = info
-    result['sub_status']['id_name']['message'] = message
+    check_ID(result)
 
-    status, info, message = is_bank_vaild(id_bank)
-    result['sub_status']['id_bank']['status'] = status
-    result['sub_status']['id_bank']['info'] = info
-    result['sub_status']['id_bank']['message'] = message
+    is_bank_vaild(result)
 
-    status, info, message = is_branch_vaild(id_branch)
-    result['sub_status']['id_branch']['status'] = status
-    result['sub_status']['id_branch']['info'] = info
-    result['sub_status']['id_branch']['message'] = message
+    is_branch_vaild(result)
 
-    status, info, message = is_account_vaild(account)
-    result['sub_status']['account']['status'] = status
-    result['sub_status']['account']['info'] = info
-    result['sub_status']['account']['message'] = message
+    is_account_vaild(result)
+
     
-
-    if (result['sub_status']['name']['status'] and
-        result['sub_status']['id_name']['status'] and
-        result['sub_status']['id_bank']['status'] and 
-        result['sub_status']['id_branch']['status'] and 
-        result['sub_status']['account']['status']):
-
-        result["status"]["status"] = True
-        result["status"]["info"] = None
-        result["status"]["message"] = "格式正確"
-    else:
-        result["status"]["status"] = False
-        result["status"]["info"] = None
-        result["status"]["message"] = "格式錯誤"
-
-    return result
-
 # name check 
-def is_name_valid(name):
-    if isinstance(name, str):   
-        return True, name, "名字有效"
+def is_name_valid(result: Result):
+
+    name = result.get_row("姓名")
+    if not isinstance(name, str):   
+        result.insert_rowerror(f"受款人", "名字無效")
     else:
-        return False, str(name), "名字無效"
+        result.insert_rowinfo("姓名", name)
+        
 
 # ID Code check
 letter_code_map = {
@@ -109,12 +80,14 @@ def is_idformat_valid(id: str):
     pattern = r'^[A-Z][0-9]{9}$'
     return bool(re.match(pattern, id))
     
-def check_ID(id = "A123456789"):
-    # print(f"ID: {id}")
-    if isinstance(id, str):   
-        if is_idformat_valid(id):
-            letter = str(id[0]).upper()
-            number = id[1:]
+def check_ID(result: Result):
+
+    name_id = result.get_row("身分證")
+    # print(f"ID: ")
+    if isinstance(name_id, str):   
+        if is_idformat_valid(name_id):
+            letter = str(name_id[0]).upper()
+            number = name_id[1:]
             
             code = get_letter_digits(letter)
             code += number
@@ -125,41 +98,63 @@ def check_ID(id = "A123456789"):
                 total += int(c) * int(w)
             
             if total % 10 == 0:
-                
-                return True, str(id), "身分證正確"
+                result.insert_rowinfo("身分證", name_id)
+                return None
             else:
-                
-                return False, str(id), "身分證錯誤"
+                result.insert_rowerror(f"受款人", "身分證未通過檢查碼")
+                return None
         else:
-            
-            return False, str(id), "身分證錯誤"
+            result.insert_rowerror(f"受款人", "身分證格式錯誤")
+            return None
     else:
+        result.insert_rowerror(f"受款人", "身分證型別錯誤")
+        return None
+
+def is_bank_vaild(result: Result):
+    code = result.get_row("銀行代碼")
+    code = str(is_int(code))
+    if code:
+        if len(code) <= 3:
+            if len(code) == 2:
+                code = "0" + code
+            elif len(code) == 1:
+                code = "00" + code
         
-        return False, str(id), "身分證錯誤"
-
-def is_bank_vaild(code: str):
-    if is_int(code) and len(code) <= 3:
-        if len(code) == 2:
-            code = "0" + code
-        elif len(code) == 1:
-            code = "00" + code
-        return True, code, "銀行代碼正確"
+            result.insert_rowinfo("銀行代碼", code)
+        else:
+            result.insert_rowerror(f"受款人", "銀行代碼長度錯誤")
     else:
-        return False, None, "銀行代碼錯誤"
+        result.insert_rowerror(f"受款人", "銀行代碼錯誤")
+        return None
     
-def is_branch_vaild(code: str):
-    if is_int(code) and len(code) == 4:
-        return True, code, "分行代碼正確"
+def is_branch_vaild(result: Result):
+    code = result.get_row("分行代碼")
+    code = str(is_int(code))
+    if code:
+        if len(code) == 4:
+            result.insert_rowinfo("分行代碼", code)
+            return None
+        else:
+            result.insert_rowerror(f"受款人", "分行代碼長度錯誤")
     else:
-        return False, None, "分行代碼錯誤"
+        result.insert_rowerror(f"受款人", "分行代碼錯誤")
+        return None
+    
+def is_account_vaild(result: Result):
+    code = result.get_row("帳號")
+    code = str(is_int(code))
+    if code:
+        if len(code) <= 18:
+            # padding to length 18
+            code = "0" * (18 - len(code)) + code
 
-def is_account_vaild(code: str):
-    if is_int(code) and len(code) <= 18:
-        # padding to length 18
-        code = "0" * (18 - len(code)) + code
-        return True, code, "帳號正確"
+            result.insert_rowinfo("帳號", code)
+            return None
+        else:
+            result.insert_rowerror(f"受款人", "帳號長度錯誤")
     else:
-        return False, None, "帳號格式錯誤"
+        result.insert_rowerror(f"受款人", "帳號錯誤")
+        return None
     
 
     
