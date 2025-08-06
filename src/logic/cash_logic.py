@@ -298,7 +298,7 @@ def test_valid_cash(number: str, cash_type:str, cash:str, history_cash: int):
         else:
             raise "費用類型錯誤"
         
-        return result[-1]
+        return cash_result[-1]
 
 # --------------------------------
     
