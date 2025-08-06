@@ -37,17 +37,14 @@ def test_validate_file(files, result_path):
     for i, file in enumerate(files):
         # print(i, file)
         validation = Result(file.name)
-        print(file.name)
+        # print(file.name)
         # st.session_state.log_lines.append(f"檔案類型: {file.type}")
         # st.session_state.log_lines.append(f"檔案大小: {file.size} bytes")
 
-
-        # file_validator)
+        # file_validator
         validate_path(file, validation)
         
-        # normalize_format(file.name, file_check_result, "檔案名稱")
-        
-        
+
         if validation.get_status():
             # schema_validator
             
@@ -59,13 +56,7 @@ def test_validate_file(files, result_path):
                 # validation.show()
 
         st.session_state.log_lines[file.name] = validation
-        #     # ------------------------------
-        #     logic_result = validate_logic(result=result["logic_validator"])
-            
-        #     normalize_format(file.name, logic_result, "表單內容")
 
-
-    # st.session_state.log_lines.append("=== 驗證完成 ===")
 
 def close_result():
     st.session_state.show_result = False
