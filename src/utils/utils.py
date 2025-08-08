@@ -31,8 +31,6 @@ class Result():
         self.check_level = None
         self.result = self._create_default_result()
         
-        
-    
     def _create_default_result(self) -> dict:
         """回傳result模板
 
@@ -78,7 +76,6 @@ class Result():
             self.result[self.check_level]["status"] = False
         # for k, v in self.result[self.check_level]["errors"].items():
         #     pass
-
 
     def get_status(self, check_level = None) -> bool:
         if check_level is None:

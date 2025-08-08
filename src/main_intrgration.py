@@ -5,7 +5,6 @@ from utils.utils import RESULT_PATH
 import uuid
 from database import DatabaseService
 
-# from result import Result
 from utils.utils import Result
 from file_validator import validate_path
 from schema_validator import validate_schema

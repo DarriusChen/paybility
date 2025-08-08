@@ -29,6 +29,7 @@ def validate_path(file, result: Result):
         is_readable_file(file, result)
 
         is_valid_company(result)
+    
 
     result.update_status()
         
